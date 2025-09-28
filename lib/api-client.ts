@@ -69,7 +69,10 @@ function getApiUrl(endpoint: string): string {
   const normalizedEndpoint = ensureLeadingSlash(endpoint);
 
   if (ABSOLUTE_URL_REGEX.test(API_BASE)) {
-    return new URL(normalizedEndpoint, `${API_BASE.replace(/\/+$/, '')}/`).toString();
+    // For absolute URLs, properly join the base URL with the endpoint
+    const baseUrl = API_BASE.replace(/\/+$/, ''); // Remove trailing slashes
+    const fullPath = normalizedEndpoint.startsWith('/') ? normalizedEndpoint.substring(1) : normalizedEndpoint;
+    return `${baseUrl}/${fullPath}`;
   }
 
   const normalizedBase =
