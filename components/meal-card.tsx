@@ -3,14 +3,23 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import type { MealCardProps } from '@/types';
 
+interface ExtendedMealCardProps extends MealCardProps {
+  mealId?: number;
+  restaurantId?: number;
+  onAddToCart?: (mealId: number, restaurantId?: number) => void;
+}
+
 export default function MealCard({
   title,
   description,
   price,
   image,
+  mealId,
+  restaurantId,
   onViewMenu,
-  onReserveTable
-}: MealCardProps) {
+  onReserveTable,
+  onAddToCart
+}: ExtendedMealCardProps) {
   return (
     <div className="bg-white rounded-tl-2xl rounded-br-2xl  shadow-lg overflow-hidden max-w-md mx-auto">
       {/* Image Section */}
@@ -20,7 +29,7 @@ export default function MealCard({
           alt={title}
           width={380}
           height={250}
-          className="object-cover w-full h-auto"
+          className="object-cover aspect-[3/2] w-full h-auto"
           priority
         />
       </div>
@@ -43,21 +52,34 @@ export default function MealCard({
         </p>
         
         {/* Buttons */}
-        <div className="flex justify-between items-center ">
-          <Button
-            variant="outline"
-            className=" px-7 rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none text-base border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-            onClick={onViewMenu}
-          >
-            View Menu
-          </Button>
-          <Button
-            variant="default"
-            className="px-4 rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none text-base bg-primary hover:bg-primary/90"
-            onClick={onReserveTable}
-          >
-            Reserve Table Now
-          </Button>
+        <div className="flex flex-col gap-3">
+          <div className="flex justify-between items-center">
+            <Button
+              variant="outline"
+              className="px-7 rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none text-base border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+              onClick={onViewMenu}
+            >
+              View Menu
+            </Button>
+            <Button
+              variant="default"
+              className="px-4 rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none text-base bg-primary hover:bg-primary/90"
+              onClick={onReserveTable}
+            >
+              Reserve Table
+            </Button>
+          </div>
+          
+          {/* Add to Cart Button */}
+          {mealId && onAddToCart && (
+            <Button
+              variant="secondary"
+              className="w-full rounded-tl-2xl rounded-br-2xl rounded-bl-none rounded-tr-none text-base"
+              onClick={() => onAddToCart(mealId, restaurantId)}
+            >
+              Add to Cart
+            </Button>
+          )}
         </div>
       </div>
     </div>

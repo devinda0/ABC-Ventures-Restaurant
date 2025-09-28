@@ -1,4 +1,112 @@
 // Central exports for all types
+import { 
+  Restaurant as PrismaRestaurant, 
+  Meal as PrismaMeal, 
+  Cart as PrismaCart, 
+  Reservation as PrismaReservation, 
+  Restaurant_Meals as PrismaRestaurant_Meals 
+} from '@prisma/client';
+
+// Prisma types exports
+export type { 
+  PrismaRestaurant as DbRestaurant, 
+  PrismaMeal as DbMeal, 
+  PrismaCart as DbCart, 
+  PrismaReservation as DbReservation, 
+  PrismaRestaurant_Meals as DbRestaurant_Meals 
+};
+
+// Extended types with relations
+export type RestaurantWithMeals = PrismaRestaurant & {
+  meals: (PrismaRestaurant_Meals & {
+    meal: PrismaMeal;
+  })[];
+};
+
+export type MealWithRestaurants = PrismaMeal & {
+  restaurants: (PrismaRestaurant_Meals & {
+    restaurant: PrismaRestaurant;
+  })[];
+};
+
+export type CartWithMeal = PrismaCart & {
+  meal: PrismaMeal;
+};
+
+export type ReservationWithRestaurant = PrismaReservation & {
+  restaurant: PrismaRestaurant;
+};
+
+// API request/response types
+export interface CreateRestaurantRequest {
+  name: string;
+  subtitle?: string;
+  tagline?: string;
+  description?: string;
+  cuisine?: string;
+  image?: string;
+  gallery?: string[];
+  city?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+}
+
+export interface UpdateRestaurantRequest extends Partial<CreateRestaurantRequest> {
+  rating?: number;
+  reviews?: number;
+}
+
+export interface CreateMealRequest {
+  title: string;
+  description?: string;
+  price: number;
+  childPrice?: number;
+  image?: string;
+  badge?: string;
+  type: string;
+  category?: string;
+  isAvailable?: boolean;
+}
+
+export interface UpdateMealRequest extends Partial<CreateMealRequest> {}
+
+export interface CreateCartRequest {
+  sessionId: string;
+  userId?: string;
+  mealId: number;
+  quantity?: number;
+  childQuantity?: number;
+  restaurantId?: number;
+  date?: string;
+}
+
+export interface UpdateCartRequest extends Partial<Omit<CreateCartRequest, 'sessionId' | 'mealId'>> {}
+
+export interface CreateReservationRequest {
+  restaurantId: number;
+  name: string;
+  email: string;
+  phone?: string;
+  date: string;
+  time: string;
+  adultCount?: number;
+  childCount?: number;
+  specialRequests?: string;
+}
+
+export interface UpdateReservationRequest extends Partial<Omit<CreateReservationRequest, 'restaurantId'>> {
+  status?: string;
+  totalAmount?: number;
+}
+
+export interface AssignMealToRestaurantRequest {
+  restaurantId: number;
+  mealId: number;
+  isAvailable?: boolean;
+  specialPrice?: number;
+}
 
 // Common types used across the application
 export type PageName = 'Home' | 'About' | 'Restaurant' | 'Services' | 'Contact';

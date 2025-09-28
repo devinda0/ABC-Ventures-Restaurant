@@ -1,33 +1,22 @@
-'use client';
-
 import Hero from "@/components/hero";
 import RestaurantCard from "@/components/restaurant-card";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { restaurantApi, utils } from "@/lib/api-client";
+import type { RestaurantWithMeals } from "@/types";
 
-const restaurants = [
-  {
-    id: 'abc-ventures',
-    name: 'ABC Ventures - City A',
-    image: '/hero-bg.jpg'
-  },
-  {
-    id: 'fine-dining',
-    name: 'Fine Dining Experience',
-    image: '/restaurant-bg.jpg'
-  },
-  {
-    id: 'casual-eats',
-    name: 'Casual Eats',
-    image: '/hero-bg.jpg'
+// Server component - fetch data at build/request time
+async function getRestaurants(): Promise<RestaurantWithMeals[]> {
+  try {
+    const response = await restaurantApi.getAll({ includeMeals: false });
+    return response.success ? response.data || [] : [];
+  } catch (error) {
+    console.error('Failed to fetch restaurants:', error);
+    return [];
   }
-];
+}
 
-export default function Restaurant() {
-  const router = useRouter();
-
-  const handleRestaurantClick = (restaurantId: string) => {
-    router.push(`/restaurant/${restaurantId}`);
-  };
+export default async function Restaurant() {
+  const restaurants = await getRestaurants();
 
   return (
     <div className="min-h-screen">
@@ -45,14 +34,21 @@ export default function Restaurant() {
         
         {/* Restaurant Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {restaurants.map((restaurant) => (
-            <RestaurantCard
-              key={restaurant.id}
-              title={restaurant.name}
-              image={restaurant.image}
-              onClick={() => handleRestaurantClick(restaurant.id)}
-            />
-          ))}
+          {restaurants.length > 0 ? (
+            restaurants.map((restaurant) => (
+              <Link key={restaurant.id} href={`/restaurant/${utils.slugify(restaurant.name)}`}>
+                <RestaurantCard
+                  title={restaurant.name}
+                  image={restaurant.image || '/hero-bg.jpg'}
+                />
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <p className="text-lg text-gray-600">No restaurants available at the moment.</p>
+              <p className="text-sm text-gray-500 mt-2">Please check back later.</p>
+            </div>
+          )}
         </div>
       </main>
     </div>

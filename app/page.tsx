@@ -1,43 +1,44 @@
-'use client'
 import Hero from "@/components/hero";
 import Footer from "@/components/footer";
-import MealCard from "@/components/meal-card";
+import HomeClient from "@/components/home-client";
+import { restaurantApi, mealApi } from "@/lib/api-client";
+import type { RestaurantWithMeals, MealWithRestaurants } from "@/types";
 
-export default function Home() {
-  const handleViewMenu = () => {
-    console.log("View Menu clicked");
-    // Add your navigation logic here
-  };
+// Server-side data fetching for featured content
+async function getFeaturedContent(): Promise<{
+  restaurants: RestaurantWithMeals[];
+  meals: MealWithRestaurants[];
+}> {
+  try {
+    // Get top restaurants (limit to 3 for homepage)
+    const restaurantResponse = await restaurantApi.getAll({ includeMeals: false });
+    const restaurants = restaurantResponse.success 
+      ? (restaurantResponse.data || []).slice(0, 3) 
+      : [];
 
-  const handleReserveTable = () => {
-    console.log("Reserve Table clicked");
-    // Add your reservation logic here
-  };
+    // Get featured meals (mix of different types)
+    const mealResponse = await mealApi.getAll({ 
+      includeRestaurants: false,
+      isAvailable: true 
+    });
+    const meals = mealResponse.success 
+      ? (mealResponse.data || []).slice(0, 6) 
+      : [];
+
+    return { restaurants, meals };
+  } catch (error) {
+    console.error('Failed to fetch featured content:', error);
+    return { restaurants: [], meals: [] };
+  }
+}
+
+export default async function Home() {
+  const { restaurants, meals } = await getFeaturedContent();
 
   return (
     <div className="min-h-screen">
       <Hero activePage="Home" />
-      <main className="p-8 pb-20 gap-16 sm:p-20">
-        {/* Your main content goes here */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 font-heading">Welcome to ABC Ventures</h1>
-          <p className="text-lg text-gray-600">
-            Distinguished leader in Qatar&apos;s hospitality and food & beverage industry
-          </p>
-        </div>
-        
-        {/* Meal Card Section */}
-        <div className="flex justify-center">
-          <MealCard
-            title="Arabic Breakfast"
-            description="Enjoy the authentic Middle Eastern flavors"
-            price="USD 1,000"
-            image="/hero/home.png"
-            onViewMenu={handleViewMenu}
-            onReserveTable={handleReserveTable}
-          />
-        </div>
-      </main>
+      <HomeClient restaurants={restaurants} meals={meals} />
       <Footer />
     </div>
   );

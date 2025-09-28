@@ -13,4 +13,104 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Restaurant {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  subtitle    String?
+  tagline     String?
+  description String?  @db.Text
+  cuisine     String?
+  rating      Float?   @default(0)
+  reviews     Int?     @default(0)
+  image       String?
+  gallery     Json?    // Array of image URLs
+  city        String?
+  address     String?  @db.Text
+  phone       String?
+  email       String?
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
+  // Relations
+  meals        Restaurant_Meals[]
+  reservations Reservation[]
+
+  @@map("restaurants")
+}
+
+model Meal {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  childPrice  Decimal? @db.Decimal(10, 2)
+  image       String?
+  badge       String?
+  type        String   // breakfast, lunch, dinner
+  category    String?  // appetizer, main course, dessert, etc.
+  isAvailable Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  restaurants Restaurant_Meals[]
+  cartItems   Cart[]
+
+  @@map("meals")
+}
+
+model Restaurant_Meals {
+  id           Int    @id @default(autoincrement())
+  restaurantId Int
+  mealId       Int
+  isAvailable  Boolean @default(true)
+  specialPrice Decimal? @db.Decimal(10, 2) // Restaurant-specific pricing
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  meal       Meal       @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@unique([restaurantId, mealId])
+  @@map("restaurant_meals")
+}
+
+model Cart {
+  id            String   @id @default(cuid())
+  sessionId     String   // For guest users
+  userId        String?  // For authenticated users
+  mealId        Int
+  quantity      Int      @default(1)
+  childQuantity Int      @default(0)
+  restaurantId  Int?     // Optional: which restaurant this meal is from
+  date          String?  // Reservation date if applicable
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@map("cart")
+}
+
+model Reservation {
+  id           String   @id @default(cuid())
+  restaurantId Int
+  name         String
+  email        String
+  phone        String?
+  date         DateTime
+  time         String
+  adultCount   Int      @default(1)
+  childCount   Int      @default(0)
+  specialRequests String? @db.Text
+  status       String   @default("pending") // pending, confirmed, cancelled
+  totalAmount  Decimal? @db.Decimal(10, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  restaurant Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+
+  @@map("reservations")
+}

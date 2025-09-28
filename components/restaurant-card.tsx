@@ -19,7 +19,7 @@ export default function RestaurantCard({
           alt={title}
           width={380}
           height={250}
-          className="object-cover w-full h-auto"
+          className="object-cover aspect-[3/2] w-full h-auto"
           priority
         />
       </div>

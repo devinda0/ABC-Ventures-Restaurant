@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { HeroProps, FormErrors, City, MealTypeDisplay, NavItem } from "@/types";
+import CartIcon from "./cart-icon";
 
 export default function Hero({ 
   backgroundImage = "/hero/home.png", 
@@ -154,13 +155,9 @@ export default function Hero({
           {/* Mobile Menu & Cart */}
           <div className="flex items-center space-x-4">
             {/* Cart */}
-            <Link href="/cart" className="flex gap-2 bg-primary px-4 py-2 rounded-tl-2xl rounded-br-2xl items-center text-white hover:bg-primary/90 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M8.7505 13.0012V16.0012C8.7505 16.4152 8.4145 16.7512 8.0005 16.7512C7.5865 16.7512 7.2505 16.4152 7.2505 16.0012V13.0012C7.2505 12.5872 7.5865 12.2512 8.0005 12.2512C8.4145 12.2512 8.7505 12.5872 8.7505 13.0012ZM12.0005 12.2512C11.5865 12.2512 11.2505 12.5872 11.2505 13.0012V16.0012C11.2505 16.4152 11.5865 16.7512 12.0005 16.7512C12.4145 16.7512 12.7505 16.4152 12.7505 16.0012V13.0012C12.7505 12.5872 12.4145 12.2512 12.0005 12.2512ZM18.1975 10.4652L17.4305 16.4752C17.1925 18.3422 15.5935 19.7502 13.7105 19.7502H6.31252C4.43652 19.7502 2.8375 18.3472 2.5945 16.4872L1.80449 10.4652C0.887489 10.0182 0.249496 9.08621 0.249496 8.00021C0.249496 6.48321 1.4825 5.25021 2.9995 5.25021H4.57552L7.35649 0.614227C7.56949 0.259227 8.03051 0.143147 8.38551 0.357147C8.74051 0.570147 8.8565 1.0312 8.6425 1.3862L6.3235 5.25021H13.6745L11.3555 1.3862C11.1425 1.0312 11.2575 0.570147 11.6125 0.357147C11.9665 0.144147 12.4275 0.259227 12.6415 0.614227L15.4225 5.25021H17.0005C18.5175 5.25021 19.7505 6.48321 19.7505 8.00021C19.7505 9.08621 19.1135 10.0182 18.1975 10.4652ZM16.6485 10.7512H3.35551L4.0825 16.2932C4.2285 17.4092 5.18752 18.2512 6.31252 18.2512H13.7105C14.8395 18.2512 15.7995 17.4062 15.9415 16.2862L16.6485 10.7512ZM18.2505 8.00119C18.2505 7.31219 17.6895 6.75119 17.0005 6.75119H3.0005C2.3115 6.75119 1.7505 7.31219 1.7505 8.00119C1.7505 8.69019 2.3115 9.25119 3.0005 9.25119H17.0005C17.6895 9.25119 18.2505 8.69019 18.2505 8.00119Z" fill="white"/>
-              </svg>
-
-              <span className="hidden sm:inline">1 Items</span>
-            </Link>
+            <div className="bg-white/20 backdrop-blur-sm rounded-full">
+              <CartIcon variant="light" />
+            </div>
 
             {/* Mobile Menu Button */}
             <button 

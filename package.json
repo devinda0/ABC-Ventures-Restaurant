@@ -11,6 +11,10 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:additional": "tsx prisma/seed-utils.ts additional-meals",
+    "db:seed:cart": "tsx prisma/seed-utils.ts cart-items",
+    "db:clear": "tsx prisma/seed-utils.ts clear",
+    "db:stats": "tsx prisma/seed-utils.ts stats",
     "db:reset": "prisma migrate reset --force --skip-seed && npm run db:seed"
   },
   "prisma": {
