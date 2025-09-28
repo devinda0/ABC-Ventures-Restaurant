@@ -13,20 +13,28 @@ import type {
 } from '@/types';
 
 // Simplified API base URL resolution
-const API_BASE = '/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
 
 // Helper function to get the full API URL
 function getApiUrl(endpoint: string): string {
   // Ensure endpoint starts with /
   const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   
-  // For client-side requests, use relative URLs
+  // For client-side requests, use relative URLs unless we have a full API base URL
   if (typeof window !== 'undefined') {
+    if (API_BASE.startsWith('http')) {
+      return `${API_BASE}${normalizedEndpoint}`;
+    }
     return `${API_BASE}${normalizedEndpoint}`;
   }
 
   // For server-side requests, try to resolve the full URL
-  // First check if we're in Vercel
+  // First check if API_BASE is already a full URL
+  if (API_BASE.startsWith('http')) {
+    return `${API_BASE}${normalizedEndpoint}`;
+  }
+
+  // Check if we're in Vercel
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}${API_BASE}${normalizedEndpoint}`;
   }
