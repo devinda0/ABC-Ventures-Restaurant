@@ -1,7 +1,8 @@
 import Hero from "@/components/hero";
 import RestaurantCard from "@/components/restaurant-card";
 import Link from "next/link";
-import { restaurantApi, utils } from "@/lib/api-client";
+import { serverDataApi } from "@/lib/server-data";
+import { utils } from "@/lib/api-client";
 import type { RestaurantWithMeals } from "@/types";
 
 // Force dynamic rendering for this page to avoid build-time API calls
@@ -10,8 +11,7 @@ export const dynamic = 'force-dynamic';
 // Server component - fetch data at build/request time
 async function getRestaurants(): Promise<RestaurantWithMeals[]> {
   try {
-    const response = await restaurantApi.getAll({ includeMeals: false });
-    return response.success ? response.data || [] : [];
+    return await serverDataApi.restaurants.getAll({ includeMeals: false });
   } catch (error) {
     console.error('Failed to fetch restaurants:', error);
     return [];

@@ -72,7 +72,7 @@ async function apiClient<T>(
 
     // Add timeout for server-side requests to prevent hanging during build
     if (typeof window === 'undefined') {
-      fetchOptions.signal = AbortSignal.timeout(5000); // 5 second timeout
+      fetchOptions.signal = AbortSignal.timeout(10000); // 10 second timeout
     }
 
     const response = await fetch(url, fetchOptions);
@@ -83,16 +83,19 @@ async function apiClient<T>(
 
     return await response.json();
   } catch (error) {
-    // Less verbose logging during build time
+    // Enhanced logging for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const logMessage = `API call failed for ${endpoint} (URL: ${getApiUrl(endpoint)}): ${errorMessage}`;
+    
     if (typeof window === 'undefined') {
-      console.warn(`API call failed for ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      console.warn(`[Server] ${logMessage}`);
     } else {
-      console.error(`API call failed for ${endpoint}:`, error);
+      console.error(`[Client] ${logMessage}`);
     }
     
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error occurred'
+      error: errorMessage
     };
   }
 }

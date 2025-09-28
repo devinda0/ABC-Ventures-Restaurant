@@ -1,7 +1,7 @@
 import Hero from "@/components/hero";
 import Footer from "@/components/footer";
 import HomeClient from "@/components/home-client";
-import { restaurantApi, mealApi } from "@/lib/api-client";
+import { serverDataApi } from "@/lib/server-data";
 import type { RestaurantWithMeals, MealWithRestaurants } from "@/types";
 
 // Force dynamic rendering for this page to avoid build-time API calls
@@ -14,21 +14,17 @@ async function getFeaturedContent(): Promise<{
 }> {
   try {
     // Get top restaurants (limit to 3 for homepage)
-    const restaurantResponse = await restaurantApi.getAll({ includeMeals: false });
-    const restaurants = restaurantResponse.success 
-      ? (restaurantResponse.data || []).slice(0, 3) 
-      : [];
+    const restaurants = await serverDataApi.restaurants.getAll({ includeMeals: false });
+    const limitedRestaurants = restaurants.slice(0, 3);
 
     // Get featured meals (mix of different types)
-    const mealResponse = await mealApi.getAll({ 
+    const meals = await serverDataApi.meals.getAll({ 
       includeRestaurants: false,
       isAvailable: true 
     });
-    const meals = mealResponse.success 
-      ? (mealResponse.data || []).slice(0, 6) 
-      : [];
+    const limitedMeals = meals.slice(0, 6);
 
-    return { restaurants, meals };
+    return { restaurants: limitedRestaurants, meals: limitedMeals };
   } catch (error) {
     console.error('Failed to fetch featured content:', error);
     return { restaurants: [], meals: [] };
