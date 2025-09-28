@@ -158,6 +158,7 @@ export default function Hero({
           {/* Mobile Menu & Cart */}
           <div className="flex items-center space-x-4">
             {/* Cart */}
+            <Link href="/cart" className="relative">
             <Button className="px-5 py-2 flex flex-row rounded-none rounded-tl-2xl rounded-br-2xl items-center gap-2">
               <div className="bg-white/20 backdrop-blur-sm rounded-full">
                 <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,6 +167,7 @@ export default function Hero({
               </div>
               <h1 className="text-white font-secondary-heading font-normal">{`${getCartItemCount()} Items`}</h1>
             </Button>
+            </Link>
 
             {/* Mobile Menu Button */}
             <button 

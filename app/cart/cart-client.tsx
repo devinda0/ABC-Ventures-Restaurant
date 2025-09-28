@@ -400,12 +400,14 @@ export default function CartClient({ items }: CartClientProps) {
               {formatCurrency(total)}
             </span>
           </div>
-          <Button
-            className="w-full bg-primary rounded-none rounded-tl-2xl rounded-br-2xl text-white font-semibold py-4 px-2"
-            disabled={isPending}
-          >
-            Checkout
-          </Button>
+          <Link href="/checkout">
+            <Button
+              className="w-full bg-primary rounded-none rounded-tl-2xl rounded-br-2xl text-white font-semibold py-4 px-2"
+              disabled={isPending}
+            >
+              Checkout
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
