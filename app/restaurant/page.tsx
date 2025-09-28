@@ -22,7 +22,7 @@ export default async function Restaurant() {
     <div className="min-h-screen">
       <Hero 
         activePage="Restaurant" 
-        backgroundImage="/restaurant-bg.jpg" // Different background for restaurant page
+        backgroundImage="/hero/home.png" // Different background for restaurant page
       />
       <main className="p-8 pb-20 gap-16 sm:p-20">
         <div className="text-center mb-12">

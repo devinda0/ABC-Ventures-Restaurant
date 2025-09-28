@@ -235,8 +235,31 @@ export interface Review {
 export interface ReservePageParams {
   restaurant: string;
   type: string;
+  [key: string]: string | string[] | undefined;
 }
 
 export interface RestaurantPageParams {
   name: string;
+  [key: string]: string | string[] | undefined;
+}
+
+// Contact form types
+export interface ContactFormData {
+  fullName: string;
+  email: string;
+  subject: string;
+  message: string;
+}
+
+export interface ContactFormStatus {
+  isSubmitting: boolean;
+  message: string;
+  type: 'success' | 'error' | '';
+}
+
+export interface EmailServiceStatus {
+  status: string;
+  email_service: string;
+  timestamp: string;
+  error?: string;
 }

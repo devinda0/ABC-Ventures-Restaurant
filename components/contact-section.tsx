@@ -1,9 +1,82 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
-
+import { contactApi } from "@/lib/api-client";
+import type { ContactFormData, ContactFormStatus } from "@/types";
 
 export default function ContactSection() {
+  const [formData, setFormData] = useState<ContactFormData>({
+    fullName: '',
+    email: '',
+    subject: '',
+    message: '',
+  });
+
+  const [formStatus, setFormStatus] = useState<ContactFormStatus>({
+    isSubmitting: false,
+    message: '',
+    type: '',
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    // Clear previous status
+    setFormStatus({ isSubmitting: true, message: '', type: '' });
+
+    try {
+      // Basic validation
+      if (!formData.fullName.trim() || !formData.email.trim() || !formData.subject.trim() || !formData.message.trim()) {
+        setFormStatus({
+          isSubmitting: false,
+          message: 'Please fill in all required fields.',
+          type: 'error',
+        });
+        return;
+      }
+
+      // Send email
+      const response = await contactApi.sendContactEmail(formData);
+
+      if (response.success) {
+        setFormStatus({
+          isSubmitting: false,
+          message: response.data?.message || 'Your message has been sent successfully!',
+          type: 'success',
+        });
+        
+        // Reset form
+        setFormData({
+          fullName: '',
+          email: '',
+          subject: '',
+          message: '',
+        });
+      } else {
+        setFormStatus({
+          isSubmitting: false,
+          message: response.error || 'Failed to send message. Please try again.',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      setFormStatus({
+        isSubmitting: false,
+        message: 'An unexpected error occurred. Please try again.',
+        type: 'error',
+      });
+    }
+  };
   return (
     <main className="p-8 pb-20 sm:p-20">
       {/* Header Section */}
@@ -71,30 +144,49 @@ export default function ContactSection() {
         <div className="bg-card px-8 rounded-lg">
           <h2 className="text-lg font-semibold font-heading mb-6 text-left">SEND YOUR MESSAGE</h2>
           
-          <form className="space-y-6">
+          {/* Status Message */}
+          {formStatus.message && (
+            <div className={`mb-6 p-4 rounded-lg ${
+              formStatus.type === 'success' 
+                ? 'bg-green-50 text-green-800 border border-green-200' 
+                : 'bg-red-50 text-red-800 border border-red-200'
+            }`}>
+              {formStatus.message}
+            </div>
+          )}
+          
+          <form className="space-y-6" onSubmit={handleSubmit}>
             {/* Name and Email Row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-2">
-                  Full Name
+                  Full Name *
                 </label>
                 <Input
                   id="fullName"
                   name="fullName"
+                  value={formData.fullName}
+                  onChange={handleInputChange}
                   placeholder="John Tyler"
                   className="bg-muted rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none"
+                  required
+                  disabled={formStatus.isSubmitting}
                 />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                  Email Address
+                  Email Address *
                 </label>
                 <Input
                   id="email"
                   name="email"
                   type="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
                   placeholder="john@gmail.com"
                   className="bg-muted rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none"
+                  required
+                  disabled={formStatus.isSubmitting}
                 />
               </div>
             </div>
@@ -102,32 +194,40 @@ export default function ContactSection() {
             {/* Subject */}
             <div>
               <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
-                Subject
+                Subject *
               </label>
-              <Select
+              <select
                 id="subject"
                 name="subject"
-                placeholder="Select a subject"
-                className="bg-muted rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none"
+                value={formData.subject}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 text-base md:text-sm rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none border border-input bg-muted shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                required
+                disabled={formStatus.isSubmitting}
               >
-                <option value="restaurant-inquiry">Restaurant Inquiry</option>
-                <option value="partnership">Partnership Opportunities</option>
-                <option value="services">Services</option>
-                <option value="general">General Inquiry</option>
-              </Select>
+                <option value="">Select a subject</option>
+                <option value="Restaurant Inquiry">Restaurant Inquiry</option>
+                <option value="Partnership Opportunities">Partnership Opportunities</option>
+                <option value="Services">Services</option>
+                <option value="General Inquiry">General Inquiry</option>
+              </select>
             </div>
 
             {/* Message */}
             <div>
               <label htmlFor="message" className="block text-sm font-medium text-foreground mb-2">
-                Message
+                Message *
               </label>
               <textarea
                 id="message"
                 name="message"
                 rows={6}
+                value={formData.message}
+                onChange={handleInputChange}
                 placeholder="Type your message here..."
                 className="w-full px-3 py-2 text-base md:text-sm rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none border border-input bg-muted shadow-xs transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                required
+                disabled={formStatus.isSubmitting}
               />
             </div>
 
@@ -136,9 +236,10 @@ export default function ContactSection() {
               <Button 
                 type="submit" 
                 size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none font-medium"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-tl-2xl rounded-tr-none rounded-br-2xl rounded-bl-none font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={formStatus.isSubmitting}
               >
-                Send Message
+                {formStatus.isSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
             </div>
           </form>

@@ -15,7 +15,8 @@ datasource db {
 
 model Restaurant {
   id          Int      @id @default(autoincrement())
-  name        String   @unique
+  name        String
+  displayName String?
   subtitle    String?
   tagline     String?
   description String?  @db.Text

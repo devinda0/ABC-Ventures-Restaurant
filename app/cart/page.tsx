@@ -30,8 +30,10 @@ export default async function CartPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <Hero backgroundImage="/hero/home.png" activePage="Home" />
-      
+      <Hero 
+        activePage="Restaurant" 
+        backgroundImage="/hero/about.png" // Different background for restaurant page
+      />
       {/* Cart Content */}
       <main className='flex flex-col w-full my-8 px-10'>
         <CartClient items={cartItems} />

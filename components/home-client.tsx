@@ -46,7 +46,7 @@ export default function HomeClient({ restaurants, meals }: HomeClientProps) {
           <div className="text-center mt-8">
             <Link 
               href="/restaurant"
-              className="inline-block bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+              className="inline-block bg-primary text-white px-8 py-3 rounded-tl-2xl rounded-br-2xl hover:bg-primary/90 transition-colors"
             >
               View All Restaurants
             </Link>
@@ -96,13 +96,13 @@ export default function HomeClient({ restaurants, meals }: HomeClientProps) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link 
             href="/restaurant"
-            className="bg-primary text-white px-8 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+            className="bg-primary text-white px-8 py-3 rounded-tl-2xl rounded-br-2xl hover:bg-primary/90 transition-colors"
           >
             Explore Restaurants
           </Link>
           <Link 
             href="/contact"
-            className="border border-primary text-primary px-8 py-3 rounded-lg hover:bg-primary hover:text-white transition-colors"
+            className="border border-primary text-primary px-8 py-3 rounded-tl-2xl rounded-br-2xl hover:bg-primary hover:text-white transition-colors"
           >
             Contact Us
           </Link>

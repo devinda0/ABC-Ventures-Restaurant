@@ -9,6 +9,7 @@ import Hero from '@/components/hero';
 import Footer from '@/components/footer';
 import { restaurantApi, utils } from '@/lib/api-client';
 import type { MealType, RestaurantPageProps, RestaurantWithMeals } from '@/types';
+import ContactSection from '@/components/contact-section';
 
 const MEAL_SECTIONS: { key: MealType; title: string }[] = [
   { key: 'breakfast', title: 'Breakfast' },
@@ -199,7 +200,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
   };
 
   const heroImage = restaurant?.image || FALLBACK_IMAGE;
-  const displayName = restaurant?.name || utils.unslugify(params.name).replace(/\b\w/g, (char) => char.toUpperCase());
+  const restaurantName = restaurant?.name || utils.unslugify(params.name).replace(/\b\w/g, (char) => char.toUpperCase());
   const displaySubtitle = restaurant?.subtitle || restaurant?.city || '';
   const displayTagline = restaurant?.tagline || FALLBACK_TAGLINE;
 
@@ -219,11 +220,11 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
 
             <div className="text-center flex flex-col items-center">
               <h1 className="font-heading text-3xl md:text-5xl font-bold text-foreground mb-2">
-                <span className="text-primary">{displayName}</span>
+                <span className="text-primary">{restaurantName}</span>
                 {displaySubtitle && (
                   <>
                     <span className="text-[#D4AF37] mx-2">-</span>
-                    <span className="text-[#D4AF37]">{displaySubtitle}</span>
+                    <span className="text-[#D4AF37]">{restaurant?.displayName}</span>
                   </>
                 )}
               </h1>
@@ -323,6 +324,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
           })}
         </div>
       </div>
+      <ContactSection />
       <Footer />
     </>
   );

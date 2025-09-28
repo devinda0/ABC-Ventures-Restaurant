@@ -6,11 +6,14 @@ import { ChevronDownIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outli
 import { useState } from "react";
 import { HeroProps, FormErrors, City, MealTypeDisplay, NavItem } from "@/types";
 import CartIcon from "./cart-icon";
+import { Button } from "./ui/button";
+import { useCart } from "@/lib/cart-context";
 
 export default function Hero({ 
   backgroundImage = "/hero/home.png", 
   activePage = 'Home' 
 }: HeroProps) {
+  const { getCartItemCount } = useCart();
   const [selectedCity, setSelectedCity] = useState("");
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedMeal, setSelectedMeal] = useState("");
@@ -155,9 +158,14 @@ export default function Hero({
           {/* Mobile Menu & Cart */}
           <div className="flex items-center space-x-4">
             {/* Cart */}
-            <div className="bg-white/20 backdrop-blur-sm rounded-full">
-              <CartIcon variant="light" />
-            </div>
+            <Button className="px-5 py-2 flex flex-row rounded-none rounded-tl-2xl rounded-br-2xl items-center gap-2">
+              <div className="bg-white/20 backdrop-blur-sm rounded-full">
+                <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M11.2505 15.0012V18.0012C11.2505 18.4152 10.9145 18.7512 10.5005 18.7512C10.0865 18.7512 9.75052 18.4152 9.75052 18.0012V15.0012C9.75052 14.5872 10.0865 14.2512 10.5005 14.2512C10.9145 14.2512 11.2505 14.5872 11.2505 15.0012ZM14.5005 14.2512C14.0865 14.2512 13.7505 14.5872 13.7505 15.0012V18.0012C13.7505 18.4152 14.0865 18.7512 14.5005 18.7512C14.9145 18.7512 15.2505 18.4152 15.2505 18.0012V15.0012C15.2505 14.5872 14.9145 14.2512 14.5005 14.2512ZM20.6975 12.4652L19.9305 18.4752C19.6925 20.3422 18.0935 21.7502 16.2105 21.7502H8.81253C6.93653 21.7502 5.33751 20.3472 5.09451 18.4872L4.3045 12.4652C3.3875 12.0182 2.74951 11.0862 2.74951 10.0002C2.74951 8.48321 3.98251 7.25021 5.49951 7.25021H7.07553L9.85651 2.61423C10.0695 2.25923 10.5305 2.14315 10.8855 2.35715C11.2405 2.57015 11.3565 3.0312 11.1425 3.3862L8.82352 7.25021H16.1745L13.8555 3.3862C13.6425 3.0312 13.7575 2.57015 14.1125 2.35715C14.4665 2.14415 14.9275 2.25923 15.1415 2.61423L17.9225 7.25021H19.5005C21.0175 7.25021 22.2505 8.48321 22.2505 10.0002C22.2505 11.0862 21.6135 12.0182 20.6975 12.4652ZM19.1485 12.7512H5.85553L6.58252 18.2932C6.72852 19.4092 7.68753 20.2512 8.81253 20.2512H16.2105C17.3395 20.2512 18.2995 19.4062 18.4415 18.2862L19.1485 12.7512ZM20.7505 10.0012C20.7505 9.31219 20.1895 8.75119 19.5005 8.75119H5.50052C4.81152 8.75119 4.25052 9.31219 4.25052 10.0012C4.25052 10.6902 4.81152 11.2512 5.50052 11.2512H19.5005C20.1895 11.2512 20.7505 10.6902 20.7505 10.0012Z" fill="white"/>
+                </svg>
+              </div>
+              <h1 className="text-white font-secondary-heading font-normal">{`${getCartItemCount()} Items`}</h1>
+            </Button>
 
             {/* Mobile Menu Button */}
             <button 
@@ -298,22 +306,6 @@ export default function Hero({
 
             <div className="hidden lg:block w-px h-12 bg-gray-200"></div>
             <div className="lg:hidden h-px w-full bg-gray-200"></div>
-
-            {/* Table Number Input */}
-            <div className="relative flex-1 min-w-[120px]">
-              <input 
-                type="number"
-                min="1"
-                max="100"
-                value={tableNo}
-                onChange={(e) => setTableNo(e.target.value)}
-                placeholder="Table No"
-                className={`w-full px-6 py-4 bg-transparent border-none outline-none ${
-                  errors.tableNo ? 'text-red-500' : 'text-gray-700'
-                }`}
-              />
-              {errors.tableNo && <div className="absolute -bottom-6 left-0 text-red-500 text-xs">{errors.tableNo}</div>}
-            </div>
 
             {/* Reserve Button */}
             <button 

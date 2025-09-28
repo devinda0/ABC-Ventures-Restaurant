@@ -325,11 +325,37 @@ export const utils = {
   },
 };
 
+// Contact API functions
+export const contactApi = {
+  // Send contact form email
+  sendContactEmail: async (data: {
+    fullName: string;
+    email: string;
+    subject: string;
+    message: string;
+  }) => {
+    return apiClient<{ message: string }>('/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Check email service status
+  checkStatus: async () => {
+    return apiClient<{
+      status: string;
+      email_service: string;
+      timestamp: string;
+    }>('/contact');
+  },
+};
+
 export default {
   restaurant: restaurantApi,
   meal: mealApi,
   cart: cartApi,
   reservation: reservationApi,
   restaurantMeal: restaurantMealApi,
+  contact: contactApi,
   utils,
 };

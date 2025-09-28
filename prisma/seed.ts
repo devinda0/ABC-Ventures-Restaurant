@@ -34,7 +34,8 @@ async function main() {
   const restaurants = await prisma.restaurant.createMany({
     data: [
       {
-        name: 'ABC Ventures - City A',
+        name: 'ABC Ventures',
+        displayName: 'City A',
         subtitle: 'Fine Dining Excellence',
         tagline: 'Where every meal is a masterpiece',
         description: 'Experience culinary artistry at its finest with our carefully crafted dishes made from the freshest ingredients. Our award-winning chefs bring you flavors from around the world.',
@@ -54,7 +55,8 @@ async function main() {
         website: 'https://abcventures.com/citya'
       },
       {
-        name: 'ABC Ventures - City B',
+        name: 'ABC Ventures',
+        displayName: 'City B',
         subtitle: 'Authentic Italian Cuisine',
         tagline: 'Traditional recipes, modern taste',
         description: 'Bringing you the authentic taste of Italy with our wood-fired pizzas and homemade pasta. Family recipes passed down through generations.',
@@ -74,7 +76,8 @@ async function main() {
         website: 'https://abcventures.com/cityb'
       },
       {
-        name: 'ABC Ventures - City C',
+        name: 'ABC Ventures',
+        displayName: 'City C',
         subtitle: 'Fresh Japanese Cuisine',
         tagline: 'Freshness you can taste',
         description: 'Premium sushi and Japanese cuisine prepared by master chefs. We source the finest fish daily to ensure the highest quality dining experience.',
@@ -94,7 +97,8 @@ async function main() {
         website: 'https://abcventures.com/cityc'
       },
       {
-        name: 'ABC Ventures - City D',
+        name: 'ABC Ventures',
+        displayName: 'City D',
         subtitle: 'Authentic Indian Flavors',
         tagline: 'Spices that tell a story',
         description: 'Journey through India with our diverse menu featuring regional specialties and traditional cooking methods. Vegetarian and vegan options available.',
@@ -128,7 +132,7 @@ async function main() {
       childPrice: 12.99,
       badge: 'Popular',
       type: 'breakfast',
-      category: 'main course'
+      category: 'Breakfast'
     },
     {
       title: 'Fluffy Pancakes',
@@ -136,7 +140,7 @@ async function main() {
       price: 12.99,
       childPrice: 8.99,
       type: 'breakfast',
-      category: 'main course'
+      category: 'Breakfast'
     },
     {
       title: 'Avocado Toast',
@@ -145,7 +149,7 @@ async function main() {
       childPrice: 10.99,
       badge: 'Healthy',
       type: 'breakfast',
-      category: 'main course'
+      category: 'Breakfast'
     },
     {
       title: 'Fresh Fruit Bowl',
@@ -154,7 +158,7 @@ async function main() {
       childPrice: 7.99,
       badge: 'Healthy',
       type: 'breakfast',
-      category: 'light meal'
+      category: 'Breakfast'
     },
 
     // Lunch items
@@ -164,7 +168,7 @@ async function main() {
       price: 13.99,
       childPrice: 9.99,
       type: 'lunch',
-      category: 'salad'
+      category: 'Lunch'
     },
     {
       title: 'Grilled Chicken Sandwich',
@@ -172,7 +176,7 @@ async function main() {
       price: 15.99,
       childPrice: 11.99,
       type: 'lunch',
-      category: 'sandwich'
+      category: 'Lunch'
     },
     {
       title: 'Fish Tacos',
@@ -181,7 +185,7 @@ async function main() {
       childPrice: 12.99,
       badge: 'Spicy',
       type: 'lunch',
-      category: 'main course'
+      category: 'Lunch'
     },
     {
       title: 'Quinoa Buddha Bowl',
@@ -190,7 +194,7 @@ async function main() {
       childPrice: 12.99,
       badge: 'Vegan',
       type: 'lunch',
-      category: 'bowl'
+      category: 'Lunch'
     },
 
     // Dinner items
@@ -201,7 +205,7 @@ async function main() {
       childPrice: 18.99,
       badge: 'Chef Special',
       type: 'dinner',
-      category: 'main course'
+      category: 'Dinner'
     },
     {
       title: 'Ribeye Steak',
@@ -210,7 +214,7 @@ async function main() {
       childPrice: 22.99,
       badge: 'Premium',
       type: 'dinner',
-      category: 'main course'
+      category: 'Dinner'
     },
     {
       title: 'Lobster Risotto',
@@ -219,7 +223,7 @@ async function main() {
       childPrice: 20.99,
       badge: 'Luxury',
       type: 'dinner',
-      category: 'main course'
+      category: 'Dinner'
     },
     {
       title: 'Vegetarian Pasta',
@@ -228,10 +232,10 @@ async function main() {
       childPrice: 14.99,
       badge: 'Vegetarian',
       type: 'dinner',
-      category: 'pasta'
+      category: 'Dinner'
     },
 
-    // Italian cuisine (for Mama Mia)
+    // Italian cuisine
     {
       title: 'Margherita Pizza',
       description: 'Classic pizza with fresh mozzarella, tomato sauce, and basil',
@@ -239,7 +243,7 @@ async function main() {
       childPrice: 12.99,
       badge: 'Classic',
       type: 'dinner',
-      category: 'pizza'
+      category: 'Dinner'
     },
     {
       title: 'Pepperoni Pizza',
@@ -248,7 +252,7 @@ async function main() {
       childPrice: 14.99,
       badge: 'Popular',
       type: 'dinner',
-      category: 'pizza'
+      category: 'Dinner'
     },
     {
       title: 'Spaghetti Carbonara',
@@ -256,10 +260,10 @@ async function main() {
       price: 22.99,
       childPrice: 16.99,
       type: 'dinner',
-      category: 'pasta'
+      category: 'Dinner'
     },
 
-    // Japanese cuisine (for Sakura)
+    // Japanese cuisine
     {
       title: 'Salmon Sashimi',
       description: 'Fresh Atlantic salmon sliced thin, served with wasabi and soy sauce',
@@ -267,7 +271,7 @@ async function main() {
       childPrice: 16.99,
       badge: 'Fresh',
       type: 'dinner',
-      category: 'sashimi'
+      category: 'Dinner'
     },
     {
       title: 'California Roll',
@@ -275,7 +279,7 @@ async function main() {
       price: 12.99,
       childPrice: 8.99,
       type: 'lunch',
-      category: 'sushi'
+      category: 'Lunch'
     },
     {
       title: 'Chirashi Bowl',
@@ -284,10 +288,10 @@ async function main() {
       childPrice: 18.99,
       badge: 'Chef Special',
       type: 'dinner',
-      category: 'bowl'
+      category: 'Dinner'
     },
 
-    // Indian cuisine (for Spice Garden)
+    // Indian cuisine
     {
       title: 'Butter Chicken',
       description: 'Tender chicken in creamy tomato-based curry sauce',
@@ -295,7 +299,7 @@ async function main() {
       childPrice: 15.99,
       badge: 'Popular',
       type: 'dinner',
-      category: 'curry'
+      category: 'Dinner'
     },
     {
       title: 'Vegetable Biryani',
@@ -304,7 +308,7 @@ async function main() {
       childPrice: 13.99,
       badge: 'Vegetarian',
       type: 'dinner',
-      category: 'rice'
+      category: 'Dinner'
     },
     {
       title: 'Lamb Vindaloo',
@@ -313,7 +317,45 @@ async function main() {
       childPrice: 17.99,
       badge: 'Spicy',
       type: 'dinner',
-      category: 'curry'
+      category: 'Dinner'
+    },
+
+    // Events & Offers items
+    {
+      title: 'Wedding Package Deluxe',
+      description: '3-course meal package for special wedding celebrations including appetizer, main course, and dessert',
+      price: 89.99,
+      childPrice: 45.99,
+      badge: 'Premium Event',
+      type: 'events',
+      category: 'Events'
+    },
+    {
+      title: 'Birthday Party Special',
+      description: 'Complete birthday celebration package with cake, decorations, and meal for parties of 10+',
+      price: 299.99,
+      childPrice: 149.99,
+      badge: 'Party Package',
+      type: 'events',
+      category: 'Events'
+    },
+    {
+      title: 'Happy Hour Special',
+      description: '50% off selected appetizers and beverages during happy hours (4-6 PM)',
+      price: 24.99,
+      childPrice: 12.99,
+      badge: '50% Off',
+      type: 'offers',
+      category: 'Offers'
+    },
+    {
+      title: 'Weekend Brunch Combo',
+      description: 'Special weekend offer: Any breakfast item + drink + dessert for a discounted price',
+      price: 29.99,
+      childPrice: 19.99,
+      badge: 'Weekend Special',
+      type: 'offers',
+      category: 'Offers'
     }
   ]
 
@@ -334,10 +376,10 @@ async function main() {
   const restaurantMealRelations = []
 
   // ABC Ventures - City A - International (all types of meals)
-  const abcCityA = createdRestaurants.find(r => r.name === 'ABC Ventures - City A')
+  const abcCityA = createdRestaurants.find(r => r.displayName === 'City A')
   if (abcCityA) {
     const cityAMeals = createdMeals.filter(m => 
-      ['Classic Eggs Benedict', 'Grilled Salmon', 'Ribeye Steak', 'Lobster Risotto', 'Caesar Salad', 'Grilled Chicken Sandwich'].includes(m.title)
+      ['Classic Eggs Benedict', 'Grilled Salmon', 'Ribeye Steak', 'Lobster Risotto', 'Caesar Salad', 'Grilled Chicken Sandwich', 'Happy Hour Special', 'Weekend Brunch Combo'].includes(m.title)
     )
     for (const meal of cityAMeals) {
       restaurantMealRelations.push({
@@ -349,10 +391,10 @@ async function main() {
   }
 
   // ABC Ventures - City B - Italian
-  const abcCityB = createdRestaurants.find(r => r.name === 'ABC Ventures - City B')
+  const abcCityB = createdRestaurants.find(r => r.displayName === 'City B')
   if (abcCityB) {
     const italianMeals = createdMeals.filter(m => 
-      ['Margherita Pizza', 'Pepperoni Pizza', 'Spaghetti Carbonara', 'Vegetarian Pasta', 'Caesar Salad'].includes(m.title)
+      ['Margherita Pizza', 'Pepperoni Pizza', 'Spaghetti Carbonara', 'Vegetarian Pasta', 'Caesar Salad', 'Wedding Package Deluxe'].includes(m.title)
     )
     for (const meal of italianMeals) {
       restaurantMealRelations.push({
@@ -364,10 +406,10 @@ async function main() {
   }
 
   // ABC Ventures - City C - Japanese
-  const abcCityC = createdRestaurants.find(r => r.name === 'ABC Ventures - City C')
+  const abcCityC = createdRestaurants.find(r => r.displayName === 'City C')
   if (abcCityC) {
     const japaneseMeals = createdMeals.filter(m => 
-      ['Salmon Sashimi', 'California Roll', 'Chirashi Bowl'].includes(m.title)
+      ['Salmon Sashimi', 'California Roll', 'Chirashi Bowl', 'Birthday Party Special'].includes(m.title)
     )
     for (const meal of japaneseMeals) {
       restaurantMealRelations.push({
@@ -379,10 +421,10 @@ async function main() {
   }
 
   // ABC Ventures - City D - Indian
-  const abcCityD = createdRestaurants.find(r => r.name === 'ABC Ventures - City D')
+  const abcCityD = createdRestaurants.find(r => r.displayName === 'City D')
   if (abcCityD) {
     const indianMeals = createdMeals.filter(m => 
-      ['Butter Chicken', 'Vegetable Biryani', 'Lamb Vindaloo'].includes(m.title)
+      ['Butter Chicken', 'Vegetable Biryani', 'Lamb Vindaloo', 'Fresh Fruit Bowl', 'Fluffy Pancakes'].includes(m.title)
     )
     for (const meal of indianMeals) {
       restaurantMealRelations.push({
