@@ -7,6 +7,7 @@ import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Hero from '@/components/hero';
 import Footer from '@/components/footer';
+import ContactSection from '@/components/contact-section';
 
 interface RestaurantPageProps {
   params: {
@@ -395,8 +396,17 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
   const restaurant = restaurantData[restaurantKey as keyof typeof restaurantData] || restaurantData.default;
 
   const handleViewMenu = (mealId: number) => {
-    // Handle view menu action
-    console.log('View menu for meal:', mealId);
+    // Determine meal type based on meal ID ranges
+    let mealType = 'breakfast';
+    if (mealId >= 4 && mealId <= 6) {
+      mealType = 'lunch';
+    } else if (mealId >= 7 && mealId <= 9) {
+      mealType = 'dinner';
+    }
+    
+    // Navigate to reserve page with restaurant and meal type
+    const restaurantKey = params.name.toLowerCase().replace(/\s+/g, '-');
+    router.push(`/reserve/${restaurantKey}/${mealType}`);
   };
 
   const handleReserveTable = (mealId: number) => {
@@ -442,10 +452,10 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
               <Button
                 key={category}
                 variant={activeCategory === category ? "default" : "outline"}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                className={`px-4 py-2 rounded-tl-2xl rounded-br-2xl rounded-tr-none rounded-bl-none text-sm bg-[#8A8787] font-medium transition-colors ${
                   activeCategory === category
-                    ? 'bg-gray-800 text-white hover:bg-gray-700'
-                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                    ? ' text-primary '
+                    : ' text-white'
                 }`}
                 onClick={() => setActiveCategory(category)}
               >
@@ -460,9 +470,21 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Breakfast Section */}
         <section className="mb-16">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-8">
-            Breakfast
-          </h2>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary">
+              Breakfast
+            </h2>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                const restaurantKey = params.name.toLowerCase().replace(/\s+/g, '-');
+                router.push(`/reserve/${restaurantKey}/breakfast`);
+              }}
+              className="text-red-600 border-red-600 hover:bg-red-50"
+            >
+              View All Breakfast
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {restaurant.meals.breakfast.map((meal) => (
               <div key={meal.id} className="relative">
@@ -486,9 +508,21 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
 
         {/* Lunch Section */}
         <section className="mb-16">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-8">
-            Lunch
-          </h2>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary">
+              Lunch
+            </h2>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                const restaurantKey = params.name.toLowerCase().replace(/\s+/g, '-');
+                router.push(`/reserve/${restaurantKey}/lunch`);
+              }}
+              className="text-red-600 border-red-600 hover:bg-red-50"
+            >
+              View All Lunch
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {restaurant.meals.lunch.map((meal) => (
               <div key={meal.id} className="relative">
@@ -512,9 +546,21 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
 
         {/* Dinner Section */}
         <section className="mb-16">
-          <h2 className="font-heading text-2xl md:text-3xl font-bold text-foreground mb-8">
-            Dinner
-          </h2>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-heading text-2xl md:text-3xl font-bold text-primary">
+              Dinner
+            </h2>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                const restaurantKey = params.name.toLowerCase().replace(/\s+/g, '-');
+                router.push(`/reserve/${restaurantKey}/dinner`);
+              }}
+              className="text-red-600 border-red-600 hover:bg-red-50"
+            >
+              View All Dinner
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {restaurant.meals.dinner.map((meal) => (
               <div key={meal.id} className="relative">
@@ -537,6 +583,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
         </section>
       </div>
     </div>
+    <ContactSection />
     <Footer />
     </>
   );

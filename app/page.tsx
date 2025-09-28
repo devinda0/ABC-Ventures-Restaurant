@@ -22,7 +22,7 @@ export default function Home() {
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold mb-4 font-heading">Welcome to ABC Ventures</h1>
           <p className="text-lg text-gray-600">
-            Distinguished leader in Qatar's hospitality and food & beverage industry
+            Distinguished leader in Qatar&apos;s hospitality and food & beverage industry
           </p>
         </div>
         

@@ -139,4 +139,33 @@
   .font-body {
     font-family: var(--font-lato), ui-sans-serif, system-ui, sans-serif;
   }
+
+  /* Remove default browser styling for select elements */
+  select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -webkit-background-clip: padding-box;
+    background-clip: padding-box;
+    -webkit-border-radius: 0;
+    border-radius: 0;
+    background-image: none;
+  }
+
+  /* Remove default styling for select in Safari */
+  select::-webkit-dropdown-arrow {
+    display: none;
+  }
+
+  /* Remove default styling for select in Firefox */
+  select:-moz-focusring {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
+
+  /* Remove default styling for select options */
+  select option {
+    background-color: var(--background);
+    color: var(--foreground);
+  }
 }

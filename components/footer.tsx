@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Facebook, Instagram, Youtube } from 'lucide-react';
+
 
 const Footer = () => {
   return (
@@ -16,7 +16,7 @@ const Footer = () => {
               className=" w-[152px] "
             />
             <p className="font-body text-sm text-[#AAAAAA] leading-relaxed max-w-sm">
-              Distinguished leader in Qatar's hospitality and food & beverage industry, 
+              Distinguished leader in Qatar&apos;s hospitality and food & beverage industry, 
               delivering unparalleled culinary experiences.
             </p>
             

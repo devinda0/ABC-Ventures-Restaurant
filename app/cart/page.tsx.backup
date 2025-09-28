@@ -1,0 +1,230 @@
+"use client"
+
+import { useState } from 'react';
+import Hero from '@/components/hero';
+import Footer from '@/components/footer';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import Image from 'next/image';
+
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  childQuantity: number;
+  childPrice: number;
+  image: string;
+  type: string;
+  date: string;
+}
+
+export default function CartPage() {
+  const [cartItems, setCartItems] = useState<CartItem[]>([
+    {
+      id: '1',
+      name: 'Breakfast',
+      price: 1000,
+      quantity: 1,
+      childQuantity: 0,
+      childPrice: 750,
+      image: '/hero/home.png',
+      type: 'Ticket Type: Standing',
+      date: 'June 13, 2025'
+    }
+  ]);
+
+  const updateQuantity = (id: string, newQuantity: number, type: 'adult' | 'child' = 'adult') => {
+    if (newQuantity < 0) return;
+    if (type === 'adult' && newQuantity < 1) return; // Adults must be at least 1
+    
+    setCartItems(items =>
+      items.map(item =>
+        item.id === id 
+          ? type === 'adult' 
+            ? { ...item, quantity: newQuantity }
+            : { ...item, childQuantity: newQuantity }
+          : item
+      )
+    );
+  };
+
+  const removeItem = (id: string) => {
+    setCartItems(items => items.filter(item => item.id !== id));
+  };
+
+  const calculateTotal = () => {
+    return cartItems.reduce((total, item) => 
+      total + (item.price * item.quantity) + (item.childPrice * item.childQuantity), 0
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <Hero backgroundImage="/hero/home.png" activePage="Home" />
+      
+      {/* Cart Content */}
+      <div className="container mx-auto px-4 py-12 max-w-6xl">
+        {/* Back Button */}
+        <div className="mb-8">
+          <Link 
+            href="/" 
+            className="inline-flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Go Back
+          </Link>
+        </div>
+
+        {cartItems.length === 0 ? (
+          <div className="text-center py-16">
+            <h2 className="text-2xl font-heading text-gray-600 mb-4">Your cart is empty</h2>
+            <Link href="/restaurant">
+              <Button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-tl-2xl rounded-br-2xl">
+                Browse Restaurants
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="max-w-4xl mx-auto">
+            {/* Cart Items */}
+            <div className="space-y-6 mb-8">
+              {cartItems.map((item) => (
+                <div key={item.id} className="bg-white border-b border-gray-200 pb-6">
+                  <div className="flex items-start gap-6">
+                    {/* Item Image */}
+                    <div className="w-32 h-24 overflow-hidden rounded-lg flex-shrink-0">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={128}
+                        height={96}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+
+                    {/* Item Details */}
+                    <div className="flex-1">
+                      <h3 className="text-2xl font-bold text-[#8B1538] mb-2">
+                        {item.name}
+                      </h3>
+                      <p className="text-gray-600 text-sm mb-4">
+                        {String(item.quantity).padStart(2, '0')} Adults x USD {item.price.toLocaleString()}
+                        {item.childQuantity > 0 && (
+                          <span className="block">
+                            {String(item.childQuantity).padStart(2, '0')} Children x USD {item.childPrice.toLocaleString()}
+                          </span>
+                        )}
+                      </p>
+                      
+                      {/* Quantity Controls Container */}
+                      <div className="space-y-3">
+                        {/* Adult Quantity Controls */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-[#D4AF37] w-20">Adults</span>
+                          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity - 1, 'adult')}
+                              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={item.quantity <= 1}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 8H4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                              </svg>
+                            </button>
+                            <span className="w-12 h-10 flex items-center justify-center text-sm font-medium border-x border-gray-300 bg-gray-50">
+                              {item.quantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.quantity + 1, 'adult')}
+                              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 4v8M4 8h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Children Quantity Controls */}
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-[#D4AF37] w-20">Children</span>
+                          <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                            <button
+                              onClick={() => updateQuantity(item.id, item.childQuantity - 1, 'child')}
+                              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                              disabled={item.childQuantity <= 0}
+                            >
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 8H4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                              </svg>
+                            </button>
+                            <span className="w-12 h-10 flex items-center justify-center text-sm font-medium border-x border-gray-300 bg-gray-50">
+                              {item.childQuantity}
+                            </span>
+                            <button
+                              onClick={() => updateQuantity(item.id, item.childQuantity + 1, 'child')}
+                              className="w-10 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors text-gray-600"
+                            >
+                              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 4v8M4 8h8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Remove Button */}
+                    <button
+                      onClick={() => removeItem(item.id)}
+                      className="text-gray-400 hover:text-red-500 transition-colors p-2 flex-shrink-0"
+                      title="Remove"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  </div>
+                  </div>
+                  
+                  {/* Golden separator line */}
+                  <div className="w-full h-0.5 bg-[#D4AF37] mt-6"></div>
+                </div>
+              ))}
+            </div>
+
+            {/* Total and Checkout Section */}
+            <div className="flex justify-end">
+              <div className="text-right space-y-4">
+                <div className="flex items-center gap-8">
+                  <span className="text-2xl font-bold text-gray-900">Total</span>
+                  <span className="text-xl">-</span>
+                  <span className="text-2xl font-bold text-gray-900">
+                    USD {calculateTotal().toLocaleString()}
+                  </span>
+                </div>
+                
+                <Button 
+                  className="bg-[#8B1538] hover:bg-[#8B1538]/90 text-white px-8 py-3 rounded-lg font-medium text-lg"
+                  onClick={() => {
+                    // Handle checkout
+                    alert('Proceeding to checkout...');
+                  }}
+                >
+                  Checkout
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <Footer />
+    </div>
+  );
+}
