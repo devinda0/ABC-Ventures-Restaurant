@@ -31,7 +31,7 @@ const nextConfig: NextConfig = {
     ]
   },
   // Output configuration for Docker
-  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  // output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
   // Skip ESLint during builds for Docker
   eslint: {
     ignoreDuringBuilds: true,

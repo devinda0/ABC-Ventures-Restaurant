@@ -240,7 +240,11 @@ export default function ReservePage() {
     setError(null);
 
     try {
-      const response = await restaurantApi.getByName(restaurantParam);
+      // Check if restaurantParam is numeric (ID) or string (name)
+      const isNumeric = /^\d+$/.test(restaurantParam);
+      const response = isNumeric 
+        ? await restaurantApi.getById(parseInt(restaurantParam), true)
+        : await restaurantApi.getByName(restaurantParam);
 
       if (!isMountedRef.current) {
         return;

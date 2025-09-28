@@ -160,7 +160,7 @@ export interface SelectProps extends React.ComponentProps<"select"> {
 // Restaurant and meal related types
 export interface RestaurantPageProps {
   params: {
-    name: string;
+    id: string;
   };
 }
 

@@ -39,7 +39,7 @@ export default async function Restaurant() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {restaurants.length > 0 ? (
             restaurants.map((restaurant) => (
-              <Link key={restaurant.id} href={`/restaurant/${utils.slugify(restaurant.name)}`}>
+              <Link key={restaurant.id} href={`/restaurant/${restaurant.id}`}>
                 <RestaurantCard
                   title={restaurant.name}
                   image={restaurant.image || '/hero-bg.jpg'}

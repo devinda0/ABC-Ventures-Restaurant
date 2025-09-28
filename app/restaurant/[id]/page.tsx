@@ -98,7 +98,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
     setLoading(true);
     setError(null);
 
-    const response = await restaurantApi.getByName(params.name);
+    const response = await restaurantApi.getById(parseInt(params.id), true);
 
     if (cancelRef.current) {
       return;
@@ -114,7 +114,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
     if (!cancelRef.current) {
       setLoading(false);
     }
-  }, [params.name]);
+  }, [params.id]);
 
   useEffect(() => {
     cancelRef.current = false;
@@ -191,7 +191,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
   };
 
   const handleReserveTable = (mealType: MealType) => {
-    router.push(`/reserve/${params.name}/${mealType}`);
+    router.push(`/reserve/${params.id}/${mealType}`);
   };
 
   const handleRetry = () => {
@@ -200,7 +200,7 @@ export default function RestaurantPage({ params }: RestaurantPageProps) {
   };
 
   const heroImage = restaurant?.image || FALLBACK_IMAGE;
-  const restaurantName = restaurant?.name || utils.unslugify(params.name).replace(/\b\w/g, (char) => char.toUpperCase());
+  const restaurantName = restaurant?.name || `Restaurant ${params.id}`;
   const displaySubtitle = restaurant?.subtitle || restaurant?.city || '';
   const displayTagline = restaurant?.tagline || FALLBACK_TAGLINE;
 
