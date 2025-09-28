@@ -263,3 +263,45 @@ export interface EmailServiceStatus {
   timestamp: string;
   error?: string;
 }
+
+// Checkout and payment related types
+export interface CheckoutFormData {
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  paymentMethod: 'card' | 'paypal';
+  cardNumber?: string;
+  expiryDate?: string;
+  cvv?: string;
+  specialRequests?: string;
+}
+
+export interface PaymentDetails {
+  amount: number;
+  currency: string;
+  method: 'card' | 'paypal';
+  cardLast4?: string;
+  transactionId: string;
+}
+
+export interface Order {
+  id: string;
+  items: CartWithMeal[];
+  customerInfo: {
+    name: string;
+    email: string;
+    phone: string;
+  };
+  paymentDetails: PaymentDetails;
+  tableNumber: number;
+  totalAmount: number;
+  status: 'pending' | 'confirmed' | 'preparing' | 'ready' | 'completed';
+  createdAt: Date;
+  specialRequests?: string;
+}
+
+export interface CheckoutResponse {
+  success: boolean;
+  order?: Order;
+  error?: string;
+}

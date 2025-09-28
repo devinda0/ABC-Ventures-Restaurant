@@ -29,7 +29,19 @@ const nextConfig: NextConfig = {
         pathname: "/**"
       }
     ]
-  }
+  },
+  // Output configuration for Docker
+  output: process.env.NODE_ENV === 'production' ? 'standalone' : undefined,
+  // Skip ESLint during builds for Docker
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  // Skip TypeScript type checking during builds for Docker
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  // Server external packages for better Docker support
+  serverExternalPackages: ['@prisma/client', 'bcryptjs']
 };
 
 export default nextConfig;

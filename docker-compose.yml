@@ -1,0 +1,64 @@
+# Minimal Docker Compose - Same as dev but uses production Dockerfile
+# Only includes essential services for local development
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: restaurant_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: restaurant_db
+      MYSQL_USER: restaurant_user
+      MYSQL_PASSWORD: restaurant_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d
+    networks:
+      - restaurant_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # Stripe Mock Server
+  stripe-mock:
+    image: stripemock/stripe-mock:latest
+    container_name: restaurant_stripe_mock
+    restart: unless-stopped
+    ports:
+      - "12111:12111"
+    networks:
+      - restaurant_network
+
+  # Next.js Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: restaurant_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - restaurant_network
+    command: >
+      sh -c "
+        npx prisma db push &&
+        node server.js
+      "
+
+volumes:
+  mysql_data:
+
+networks:
+  restaurant_network:
+    driver: bridge
