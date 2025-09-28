@@ -9,12 +9,13 @@ interface Params {
 // GET /api/cart/[id] - Get a single cart item
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     const cartItem = await prisma.cart.findUnique({
       where: {
-        id: params.id
+        id
       },
       include: {
         meal: true
@@ -44,14 +45,15 @@ export async function GET(
 // PUT /api/cart/[id] - Update a cart item
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
     const body: UpdateCartRequest = await request.json();
+    const { id } = await context.params;
 
     const cartItem = await prisma.cart.update({
       where: {
-        id: params.id
+        id
       },
       data: {
         quantity: body.quantity,
@@ -88,12 +90,13 @@ export async function PUT(
 // DELETE /api/cart/[id] - Remove a cart item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     await prisma.cart.delete({
       where: {
-        id: params.id
+        id
       }
     });
 

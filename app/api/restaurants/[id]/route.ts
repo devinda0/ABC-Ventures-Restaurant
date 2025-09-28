@@ -9,16 +9,17 @@ interface Params {
 // GET /api/restaurants/[id] - Get a single restaurant
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     const { searchParams } = new URL(request.url);
     const includeMeals = searchParams.get('includeMeals') === 'true';
     const includeReservations = searchParams.get('includeReservations') === 'true';
 
     const restaurant = await prisma.restaurant.findUnique({
       where: {
-        id: parseInt(params.id)
+        id: parseInt(id)
       },
       include: {
         meals: includeMeals ? {
@@ -53,14 +54,15 @@ export async function GET(
 // PUT /api/restaurants/[id] - Update a restaurant
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
     const body: UpdateRestaurantRequest = await request.json();
+    const { id } = await context.params;
 
     const restaurant = await prisma.restaurant.update({
       where: {
-        id: parseInt(params.id)
+        id: parseInt(id)
       },
       data: {
         name: body.name,
@@ -111,12 +113,13 @@ export async function PUT(
 // DELETE /api/restaurants/[id] - Delete a restaurant
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     await prisma.restaurant.delete({
       where: {
-        id: parseInt(params.id)
+        id: parseInt(id)
       }
     });
 

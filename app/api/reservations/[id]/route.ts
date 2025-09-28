@@ -9,12 +9,13 @@ interface Params {
 // GET /api/reservations/[id] - Get a single reservation
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     const reservation = await prisma.reservation.findUnique({
       where: {
-        id: params.id
+        id
       },
       include: {
         restaurant: true
@@ -44,10 +45,11 @@ export async function GET(
 // PUT /api/reservations/[id] - Update a reservation
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
     const body: UpdateReservationRequest = await request.json();
+    const { id } = await context.params;
 
     const updateData: any = {};
     if (body.name !== undefined) updateData.name = body.name;
@@ -73,7 +75,7 @@ export async function PUT(
 
     const reservation = await prisma.reservation.update({
       where: {
-        id: params.id
+        id
       },
       data: updateData,
       include: {
@@ -105,12 +107,13 @@ export async function PUT(
 // DELETE /api/reservations/[id] - Delete a reservation
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     await prisma.reservation.delete({
       where: {
-        id: params.id
+        id
       }
     });
 

@@ -8,12 +8,13 @@ interface Params {
 // GET /api/restaurant-meals/[id] - Get a single restaurant-meal relationship
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     const restaurantMeal = await prisma.restaurant_Meals.findUnique({
       where: {
-        id: parseInt(params.id)
+        id: parseInt(id)
       },
       include: {
         restaurant: true,
@@ -44,14 +45,15 @@ export async function GET(
 // PUT /api/restaurant-meals/[id] - Update a restaurant-meal relationship
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
     const body = await request.json();
+    const { id } = await context.params;
 
     const restaurantMeal = await prisma.restaurant_Meals.update({
       where: {
-        id: parseInt(params.id)
+        id: parseInt(id)
       },
       data: {
         isAvailable: body.isAvailable,
@@ -87,12 +89,13 @@ export async function PUT(
 // DELETE /api/restaurant-meals/[id] - Remove a meal from a restaurant
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params }
+  context: { params: Promise<Params> }
 ) {
   try {
+    const { id } = await context.params;
     await prisma.restaurant_Meals.delete({
       where: {
-        id: parseInt(params.id)
+        id: parseInt(id)
       }
     });
 

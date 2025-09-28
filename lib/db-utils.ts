@@ -1,335 +1,259 @@
+import { Prisma } from '@prisma/client'
 import { prisma } from './prisma'
+import type {
+  CreateCartRequest,
+  UpdateCartRequest,
+  CreateReservationRequest,
+  UpdateReservationRequest
+} from '@/types'
 
-// Restaurant utilities
+type RestaurantIncludeOptions = {
+  includeMeals?: boolean
+  includeReservations?: boolean
+}
+
+// Restaurant utilities aligned with the current Prisma schema
 export const restaurantUtils = {
-  // Get all restaurants with basic info
-  async getAll() {
-    return await prisma.restaurant.findMany({
-      where: { isActive: true },
+  async getAll(options: RestaurantIncludeOptions = {}) {
+    const { includeMeals = false, includeReservations = false } = options
+
+    return prisma.restaurant.findMany({
       include: {
-        _count: {
-          select: { reviews: true }
-        }
+        meals: includeMeals
+          ? {
+              include: { meal: true }
+            }
+          : undefined,
+        reservations: includeReservations ? true : undefined
       },
-      orderBy: { rating: 'desc' }
+      orderBy: [{ rating: 'desc' }, { name: 'asc' }]
     })
   },
 
-  // Get restaurant by slug with full details
-  async getBySlug(slug: string) {
-    return await prisma.restaurant.findUnique({
-      where: { slug },
+  async getById(id: number, options: RestaurantIncludeOptions = {}) {
+    const { includeMeals = false, includeReservations = false } = options
+
+    return prisma.restaurant.findUnique({
+      where: { id },
       include: {
-        tables: true,
-        menuItems: {
-          include: { category: true },
-          where: { isAvailable: true },
-          orderBy: [
-            { category: { sortOrder: 'asc' } },
-            { sortOrder: 'asc' },
-            { name: 'asc' }
-          ]
-        },
-        reviews: {
-          include: { user: { select: { name: true, avatar: true } } },
-          where: { isVisible: true },
-          orderBy: { createdAt: 'desc' },
-          take: 10
-        },
-        _count: {
-          select: { reviews: true, reservations: true }
-        }
+        meals: includeMeals
+          ? {
+              include: { meal: true }
+            }
+          : undefined,
+        reservations: includeReservations ? true : undefined
       }
     })
   },
 
-  // Get restaurants by cuisine
   async getByCuisine(cuisine: string) {
-    return await prisma.restaurant.findMany({
-      where: { 
-        cuisine: { contains: cuisine },
-        isActive: true 
+    return prisma.restaurant.findMany({
+      where: {
+  cuisine: { contains: cuisine }
       },
-      include: {
-        _count: { select: { reviews: true } }
-      }
+      orderBy: [{ rating: 'desc' }, { name: 'asc' }]
     })
   }
 }
 
-// Menu utilities
+// Menu utilities mapped to Restaurant_Meals join table
 export const menuUtils = {
-  // Get menu categories with items for a restaurant
-  async getMenuByRestaurant(restaurantId: string) {
-    return await prisma.menuCategory.findMany({
-      include: {
-        menuItems: {
-          where: { 
-            restaurantId,
-            isAvailable: true 
-          },
-          orderBy: { sortOrder: 'asc' }
-        }
-      },
-      orderBy: { sortOrder: 'asc' }
+  async getMenuByRestaurant(restaurantId: number) {
+    return prisma.restaurant_Meals.findMany({
+      where: { restaurantId },
+      include: { meal: true },
+      orderBy: [{ meal: { type: 'asc' } }, { meal: { title: 'asc' } }]
     })
   },
 
-  // Search menu items
-  async searchItems(query: string, restaurantId?: string) {
-    return await prisma.menuItem.findMany({
-      where: {
-        AND: [
-          restaurantId ? { restaurantId } : {},
-          {
-            OR: [
-              { name: { contains: query } },
-              { description: { contains: query } }
-            ]
-          },
-          { isAvailable: true }
-        ]
-      },
+  async search(query: string, restaurantId?: number) {
+    const where: Prisma.MealWhereInput = {
+      OR: [
+        { title: { contains: query } },
+        { description: { contains: query } }
+      ]
+    }
+
+    if (restaurantId !== undefined) {
+      where.restaurants = { some: { restaurantId } }
+    }
+
+    return prisma.meal.findMany({
+      where,
       include: {
-        restaurant: { select: { name: true, slug: true } },
-        category: { select: { name: true } }
-      }
+        restaurants: {
+          include: { restaurant: true }
+        }
+      },
+      orderBy: [{ type: 'asc' }, { title: 'asc' }]
     })
   }
 }
 
 // Reservation utilities
 export const reservationUtils = {
-  // Create a new reservation
-  async create(data: {
-    restaurantId: string
-    reservationDate: Date
-    timeSlot: string
-    partySize: number
-    customerName: string
-    customerEmail: string
-    customerPhone: string
-    specialRequests?: string
-    userId?: string
-  }) {
-    return await prisma.reservation.create({
-      data,
+  async create(payload: CreateReservationRequest & { totalAmount?: number; status?: string }) {
+    const { date, restaurantId, totalAmount, status, ...rest } = payload
+
+    return prisma.reservation.create({
+      data: {
+        ...rest,
+        restaurantId,
+        date: new Date(date),
+        status: status ?? undefined,
+        totalAmount: totalAmount !== undefined ? new Prisma.Decimal(totalAmount) : undefined
+      },
       include: {
-        restaurant: { select: { name: true, address: true, phone: true } }
+        restaurant: true
       }
     })
   },
 
-  // Get available time slots for a restaurant on a specific date
-  async getAvailableSlots(restaurantId: string, date: Date) {
-    const reservations = await prisma.reservation.findMany({
+  async update(id: string, payload: UpdateReservationRequest) {
+    const { date, totalAmount, ...rest } = payload
+
+    return prisma.reservation.update({
+      where: { id },
+      data: {
+        ...rest,
+        date: date ? new Date(date) : undefined,
+        totalAmount: totalAmount !== undefined ? new Prisma.Decimal(totalAmount) : undefined
+      },
+      include: {
+        restaurant: true
+      }
+    })
+  },
+
+  async listByRestaurant(restaurantId: number, range?: { start: Date; end: Date }) {
+    return prisma.reservation.findMany({
       where: {
         restaurantId,
-        reservationDate: {
-          gte: new Date(date.setHours(0, 0, 0, 0)),
-          lt: new Date(date.setHours(23, 59, 59, 999))
-        },
-        status: { in: ['PENDING', 'CONFIRMED'] }
+        ...(range
+          ? {
+              date: {
+                gte: range.start,
+                lte: range.end
+              }
+            }
+          : {})
       },
-      include: { table: true }
+      orderBy: [{ date: 'asc' }, { time: 'asc' }]
     })
-
-    const tables = await prisma.table.findMany({
-      where: { restaurantId, isActive: true }
-    })
-
-    // This is a simplified version - you'd implement more complex logic
-    // to determine actual availability based on table capacity and time slots
-    return {
-      availableSlots: [
-        '17:00-19:00',
-        '19:00-21:00',
-        '21:00-23:00'
-      ],
-      totalTables: tables.length,
-      reservedSlots: reservations.length
-    }
   }
 }
 
-// Order utilities
-export const orderUtils = {
-  // Create a new order
-  async create(data: {
-    userId?: string
-    items: Array<{ menuItemId: string; quantity: number; specialNotes?: string }>
-    orderType: 'DINE_IN' | 'TAKEAWAY' | 'DELIVERY'
-    deliveryAddress?: string
-    specialInstructions?: string
-  }) {
-    const { items, ...orderData } = data
+// Cart utilities aligned with single Cart table
+export const cartUtils = {
+  async list(identifier: { sessionId?: string; userId?: string }) {
+    if (!identifier.sessionId && !identifier.userId) {
+      throw new Error('sessionId or userId is required')
+    }
 
-    // Calculate totals
-    const menuItems = await prisma.menuItem.findMany({
-      where: { id: { in: items.map(item => item.menuItemId) } }
-    })
-
-    let totalAmount = 0
-    const orderItems = items.map(item => {
-      const menuItem = menuItems.find(mi => mi.id === item.menuItemId)
-      if (!menuItem) throw new Error(`Menu item ${item.menuItemId} not found`)
-      
-      const itemTotal = Number(menuItem.price) * item.quantity
-      totalAmount += itemTotal
-
-      return {
-        menuItemId: item.menuItemId,
-        quantity: item.quantity,
-        unitPrice: menuItem.price,
-        totalPrice: itemTotal,
-        specialNotes: item.specialNotes
-      }
-    })
-
-    return await prisma.order.create({
-      data: {
-        ...orderData,
-        totalAmount,
-        orderItems: {
-          create: orderItems
-        }
+    return prisma.cart.findMany({
+      where: {
+        ...(identifier.sessionId ? { sessionId: identifier.sessionId } : {}),
+        ...(identifier.userId ? { userId: identifier.userId } : {})
       },
-      include: {
-        orderItems: {
-          include: { menuItem: true }
-        }
-      }
+      include: { meal: true },
+      orderBy: [{ createdAt: 'desc' }]
     })
   },
 
-  // Get order by ID
-  async getById(orderId: string) {
-    return await prisma.order.findUnique({
-      where: { id: orderId },
-      include: {
-        orderItems: {
-          include: { menuItem: { include: { restaurant: true } } }
-        },
-        user: { select: { name: true, email: true, phone: true } }
-      }
-    })
-  }
-}
+  async upsertItem(payload: CreateCartRequest) {
+    const {
+      sessionId,
+      mealId,
+      userId,
+      quantity = 1,
+      childQuantity = 0,
+      restaurantId,
+      date
+    } = payload
 
-// Cart utilities
-export const cartUtils = {
-  // Get or create cart
-  async getOrCreate(identifier: { userId?: string; sessionId?: string }) {
-    let cart = await prisma.cart.findFirst({
-      where: identifier.userId 
-        ? { userId: identifier.userId }
-        : { sessionId: identifier.sessionId },
-      include: {
-        cartItems: {
-          include: { menuItem: { include: { restaurant: true } } }
-        }
+    const existing = await prisma.cart.findFirst({
+      where: {
+        sessionId,
+        mealId,
+        userId: userId ?? null,
+        restaurantId: restaurantId ?? null,
+        date: date ?? null
       }
     })
 
-    if (!cart) {
-      cart = await prisma.cart.create({
+    if (existing) {
+      return prisma.cart.update({
+        where: { id: existing.id },
         data: {
-          ...identifier,
-          expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000) // 24 hours
+          quantity: existing.quantity + quantity,
+          childQuantity: existing.childQuantity + childQuantity,
+          restaurantId: restaurantId ?? existing.restaurantId ?? null,
+          date: date ?? existing.date ?? null
         },
-        include: {
-          cartItems: {
-            include: { menuItem: { include: { restaurant: true } } }
-          }
-        }
+        include: { meal: true }
       })
     }
 
-    return cart
-  },
-
-  // Add item to cart
-  async addItem(cartId: string, menuItemId: string, quantity: number = 1, specialNotes?: string) {
-    return await prisma.cartItem.upsert({
-      where: {
-        cartId_menuItemId: { cartId, menuItemId }
-      },
-      update: {
-        quantity: { increment: quantity },
-        specialNotes
-      },
-      create: {
-        cartId,
-        menuItemId,
+    return prisma.cart.create({
+      data: {
+        sessionId,
+        mealId,
+        userId,
         quantity,
-        specialNotes
+        childQuantity,
+        restaurantId: restaurantId ?? null,
+        date: date ?? null
       },
-      include: {
-        menuItem: true
-      }
+      include: { meal: true }
     })
   },
 
-  // Remove item from cart
-  async removeItem(cartId: string, menuItemId: string) {
-    return await prisma.cartItem.delete({
-      where: {
-        cartId_menuItemId: { cartId, menuItemId }
-      }
-    })
-  },
+  async updateItem(id: string, payload: UpdateCartRequest) {
+    const data: Prisma.CartUpdateInput = {}
 
-  // Clear cart
-  async clear(cartId: string) {
-    return await prisma.cartItem.deleteMany({
-      where: { cartId }
-    })
-  }
-}
+    if (payload.quantity !== undefined) {
+      data.quantity = payload.quantity
+    }
 
-// Review utilities
-export const reviewUtils = {
-  // Create a review
-  async create(data: {
-    userId: string
-    restaurantId: string
-    rating: number
-    comment?: string
-  }) {
-    const review = await prisma.review.create({
+    if (payload.childQuantity !== undefined) {
+      data.childQuantity = payload.childQuantity
+    }
+
+    if (payload.restaurantId !== undefined) {
+      data.restaurantId = payload.restaurantId
+    }
+
+    if (payload.date !== undefined) {
+      data.date = payload.date
+    }
+
+    if (payload.userId !== undefined) {
+      data.userId = payload.userId
+    }
+
+    return prisma.cart.update({
+      where: { id },
       data,
-      include: {
-        user: { select: { name: true, avatar: true } },
-        restaurant: { select: { name: true } }
-      }
+      include: { meal: true }
     })
-
-    // Update restaurant rating
-    const avgRating = await prisma.review.aggregate({
-      where: { restaurantId: data.restaurantId },
-      _avg: { rating: true }
-    })
-
-    await prisma.restaurant.update({
-      where: { id: data.restaurantId },
-      data: { rating: avgRating._avg.rating || 0 }
-    })
-
-    return review
   },
 
-  // Get reviews for a restaurant
-  async getByRestaurant(restaurantId: string, page: number = 1, limit: number = 10) {
-    const skip = (page - 1) * limit
+  async remove(id: string) {
+    return prisma.cart.delete({
+      where: { id }
+    })
+  },
 
-    return await prisma.review.findMany({
-      where: { restaurantId, isVisible: true },
-      include: {
-        user: { select: { name: true, avatar: true } }
-      },
-      orderBy: { createdAt: 'desc' },
-      skip,
-      take: limit
+  async clear(identifier: { sessionId?: string; userId?: string }) {
+    if (!identifier.sessionId && !identifier.userId) {
+      throw new Error('sessionId or userId is required')
+    }
+
+    return prisma.cart.deleteMany({
+      where: {
+        ...(identifier.sessionId ? { sessionId: identifier.sessionId } : {}),
+        ...(identifier.userId ? { userId: identifier.userId } : {})
+      }
     })
   }
 }
