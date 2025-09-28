@@ -2,10 +2,7 @@ import * as React from "react"
 import { ChevronDownIcon } from "@heroicons/react/24/outline"
 
 import { cn } from "@/lib/utils"
-
-interface SelectProps extends React.ComponentProps<"select"> {
-  placeholder?: string;
-}
+import type { SelectProps } from '@/types';
 
 function Select({ className, placeholder, children, ...props }: SelectProps) {
   return (

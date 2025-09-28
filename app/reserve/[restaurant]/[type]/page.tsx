@@ -4,13 +4,14 @@ import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, Star, Calendar, Minus, Plus } from 'lucide-react';
+import { Star, Calendar } from 'lucide-react';
 import Hero from '@/components/hero';
 import Footer from '@/components/footer';
 import ReviewCard from '@/components/review-card';
+import type { Review, RestaurantDetails } from '@/types';
 
 
-const reviews = [
+const reviews: Review[] = [
   {
     name: "John Doe",
     rating: 5,
@@ -74,7 +75,7 @@ const restaurantData = {
   }
 };
 
-const mealData = {
+const mealData: Record<string, RestaurantDetails> = {
   breakfast: {
     title: 'Breakfast',
     subtitle: 'An Authentic Arabian Breakfast Experience',

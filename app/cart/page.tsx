@@ -6,18 +6,7 @@ import Footer from '@/components/footer';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-
-interface CartItem {
-  id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  childQuantity: number;
-  childPrice: number;
-  image: string;
-  type: string;
-  date: string;
-}
+import type { CartItem, QuantityType } from '@/types';
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([
@@ -34,7 +23,7 @@ export default function CartPage() {
     }
   ]);
 
-  const updateQuantity = (id: string, newQuantity: number, type: 'adult' | 'child' = 'adult') => {
+  const updateQuantity = (id: string, newQuantity: number, type: QuantityType = 'adult') => {
     if (newQuantity < 0) return;
     if (type === 'adult' && newQuantity < 1) return; // Adults must be at least 1
     

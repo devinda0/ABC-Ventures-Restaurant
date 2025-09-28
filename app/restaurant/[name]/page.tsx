@@ -8,33 +8,7 @@ import { useRouter } from 'next/navigation';
 import Hero from '@/components/hero';
 import Footer from '@/components/footer';
 import ContactSection from '@/components/contact-section';
-
-interface RestaurantPageProps {
-  params: {
-    name: string;
-  };
-}
-
-interface Meal {
-  id: number;
-  title: string;
-  description: string;
-  price: string;
-  image: string;
-  badge?: string;
-}
-
-interface RestaurantData {
-  name: string;
-  subtitle: string;
-  tagline: string;
-  categories: string[];
-  meals: {
-    breakfast: Meal[];
-    lunch: Meal[];
-    dinner: Meal[];
-  };
-}
+import type { RestaurantPageProps, RestaurantData } from '@/types';
 
 // Mock data for different restaurants
 const restaurantData: Record<string, RestaurantData> = {

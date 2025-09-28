@@ -1,13 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-
-interface ReviewCardProps {
-  name: string;
-  rating: number;
-  review: string;
-  date: string;
-  profileImage: string;
-}
+import type { ReviewCardProps } from '@/types';
 
 export default function ReviewCard({
   name,

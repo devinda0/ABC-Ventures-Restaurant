@@ -1,11 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-
-interface RestaurantCardProps {
-  title: string;
-  image: string;
-  onClick?: () => void;
-}
+import type { RestaurantCardProps } from '@/types';
 
 export default function RestaurantCard({
   title,

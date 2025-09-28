@@ -4,11 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronDownIcon, Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-
-interface HeroProps {
-  backgroundImage?: string;
-  activePage?: 'Home' | 'About' | 'Restaurant' | 'Services' | 'Contact';
-}
+import { HeroProps, FormErrors, City, MealTypeDisplay, NavItem } from "@/types";
 
 export default function Hero({ 
   backgroundImage = "/hero/home.png", 
@@ -21,9 +17,9 @@ export default function Hero({
   const [children, setChildren] = useState("");
   const [tableNo, setTableNo] = useState("");
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [errors, setErrors] = useState<{[key: string]: string}>({});
+  const [errors, setErrors] = useState<FormErrors>({});
 
-  const navItems = [
+  const navItems: NavItem[] = [
     { name: 'Home', href: '/' },
     { name: 'About', href: '/about' },
     { name: 'Restaurant', href: '/restaurant' },
@@ -31,17 +27,17 @@ export default function Hero({
     { name: 'Contact', href: '/contact' },
   ];
 
-  const cities = [
+  const cities: City[] = [
     "City A",
     "City B", 
     "City C",
     "City D"
   ];
 
-  const mealTypes = ["Breakfast", "Lunch", "Dinner"];
+  const mealTypes: MealTypeDisplay[] = ["Breakfast", "Lunch", "Dinner"];
 
   const validateForm = () => {
-    const newErrors: {[key: string]: string} = {};
+    const newErrors: FormErrors = {};
 
     if (!selectedCity) {
       newErrors.city = "Please select a city";

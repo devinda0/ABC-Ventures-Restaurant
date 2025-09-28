@@ -1,15 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-
-interface MealCardProps {
-  title: string;
-  description: string;
-  price: string;
-  image: string;
-  onViewMenu?: () => void;
-  onReserveTable?: () => void;
-}
+import type { MealCardProps } from '@/types';
 
 export default function MealCard({
   title,
