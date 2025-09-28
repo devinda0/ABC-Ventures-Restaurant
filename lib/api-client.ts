@@ -120,7 +120,8 @@ export const restaurantApi = {
   // Get restaurant by ID
   getById: async (id: number, includeMeals = true) => {
     const params = includeMeals ? '?includeMeals=true' : '';
-    return apiClient<RestaurantWithMeals>(`/restaurants/${id}${params}`);
+    const response = await apiClient<RestaurantWithMeals>(`/restaurants/${id}${params}`);
+    return response;
   },
 
   // Get restaurant by name (for URL-friendly names)
