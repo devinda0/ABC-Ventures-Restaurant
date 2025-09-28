@@ -3,6 +3,9 @@ import { redirect } from 'next/navigation';
 import { cartApi } from '@/lib/api-client';
 import CheckoutClient from './checkout-client';
 
+// Force dynamic rendering to avoid build-time API calls
+export const dynamic = 'force-dynamic';
+
 export default async function CheckoutPage() {
   const cookieStore = await cookies();
   const sessionId = cookieStore.get('sessionId')?.value;

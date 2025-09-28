@@ -12,78 +12,37 @@ import type {
   UpdateReservationRequest
 } from '@/types';
 
-const RAW_API_BASE =
-  process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ??
-  process.env.API_BASE_URL?.trim() ??
-  '/api';
-
-const API_BASE = RAW_API_BASE === '' ? '/api' : RAW_API_BASE;
-const ABSOLUTE_URL_REGEX = /^https?:\/\//i;
-
-const ensureLeadingSlash = (value: string) =>
-  value.startsWith('/') ? value : `/${value}`;
-
-const toAbsoluteUrl = (value?: string | null) => {
-  if (!value) return undefined;
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-
-  try {
-    const candidate = ABSOLUTE_URL_REGEX.test(trimmed)
-      ? trimmed
-      : `https://${trimmed}`;
-
-    const parsed = new URL(candidate);
-    return `${parsed.protocol}//${parsed.host}`;
-  } catch (error) {
-    console.warn('Invalid site URL value provided:', value, error);
-    return undefined;
-  }
-};
-
-function resolveSiteOrigin(): string {
-  const candidates = [
-    process.env.NEXT_PUBLIC_SITE_URL,
-    process.env.SITE_URL,
-    process.env.APP_URL,
-    process.env.NEXTAUTH_URL,
-  ];
-
-  for (const candidate of candidates) {
-    const absolute = toAbsoluteUrl(candidate);
-    if (absolute) {
-      return absolute;
-    }
-  }
-
-  const vercelHost = process.env.VERCEL_URL;
-  if (vercelHost) {
-    return toAbsoluteUrl(vercelHost) ?? 'http://localhost:3000';
-  }
-
-  return 'http://localhost:3000';
-}
+// Simplified API base URL resolution
+const API_BASE = '/api';
 
 // Helper function to get the full API URL
 function getApiUrl(endpoint: string): string {
-  const normalizedEndpoint = ensureLeadingSlash(endpoint);
-
-  if (ABSOLUTE_URL_REGEX.test(API_BASE)) {
-    // For absolute URLs, properly join the base URL with the endpoint
-    const baseUrl = API_BASE.replace(/\/+$/, ''); // Remove trailing slashes
-    const fullPath = normalizedEndpoint.startsWith('/') ? normalizedEndpoint.substring(1) : normalizedEndpoint;
-    return `${baseUrl}/${fullPath}`;
-  }
-
-  const normalizedBase =
-    API_BASE === '/' ? '' : ensureLeadingSlash(API_BASE.replace(/\/+$/, ''));
-
+  // Ensure endpoint starts with /
+  const normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
+  
+  // For client-side requests, use relative URLs
   if (typeof window !== 'undefined') {
-    return `${normalizedBase}${normalizedEndpoint}`;
+    return `${API_BASE}${normalizedEndpoint}`;
   }
 
-  const origin = resolveSiteOrigin();
-  return `${origin}${normalizedBase}${normalizedEndpoint}`;
+  // For server-side requests, try to resolve the full URL
+  // First check if we're in Vercel
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}${API_BASE}${normalizedEndpoint}`;
+  }
+
+  // Check for other common site URL environment variables
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 
+                  process.env.SITE_URL || 
+                  process.env.NEXTAUTH_URL;
+                  
+  if (siteUrl) {
+    const baseUrl = siteUrl.replace(/\/+$/, ''); // Remove trailing slashes
+    return `${baseUrl}${API_BASE}${normalizedEndpoint}`;
+  }
+
+  // Default to localhost for development
+  return `http://localhost:3000${API_BASE}${normalizedEndpoint}`;
 }
 
 // Generic API client with error handling
@@ -93,13 +52,22 @@ async function apiClient<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const url = getApiUrl(endpoint);
-    const response = await fetch(url, {
+    
+    // For server-side requests during build time, add timeout and error handling
+    const fetchOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
       ...options,
-    });
+    };
+
+    // Add timeout for server-side requests to prevent hanging during build
+    if (typeof window === 'undefined') {
+      fetchOptions.signal = AbortSignal.timeout(5000); // 5 second timeout
+    }
+
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
       throw new Error(`API Error: ${response.status} ${response.statusText}`);
@@ -107,7 +75,13 @@ async function apiClient<T>(
 
     return await response.json();
   } catch (error) {
-    console.error(`API call failed for ${endpoint}:`, error);
+    // Less verbose logging during build time
+    if (typeof window === 'undefined') {
+      console.warn(`API call failed for ${endpoint}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } else {
+      console.error(`API call failed for ${endpoint}:`, error);
+    }
+    
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error occurred'

@@ -4,6 +4,9 @@ import HomeClient from "@/components/home-client";
 import { restaurantApi, mealApi } from "@/lib/api-client";
 import type { RestaurantWithMeals, MealWithRestaurants } from "@/types";
 
+// Force dynamic rendering for this page to avoid build-time API calls
+export const dynamic = 'force-dynamic';
+
 // Server-side data fetching for featured content
 async function getFeaturedContent(): Promise<{
   restaurants: RestaurantWithMeals[];

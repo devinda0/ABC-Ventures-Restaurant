@@ -4,6 +4,9 @@ import Link from "next/link";
 import { restaurantApi, utils } from "@/lib/api-client";
 import type { RestaurantWithMeals } from "@/types";
 
+// Force dynamic rendering for this page to avoid build-time API calls
+export const dynamic = 'force-dynamic';
+
 // Server component - fetch data at build/request time
 async function getRestaurants(): Promise<RestaurantWithMeals[]> {
   try {
