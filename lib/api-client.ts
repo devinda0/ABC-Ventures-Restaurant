@@ -12,17 +12,75 @@ import type {
   UpdateReservationRequest
 } from '@/types';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api';
+const RAW_API_BASE =
+  process.env.NEXT_PUBLIC_API_BASE_URL?.trim() ??
+  process.env.API_BASE_URL?.trim() ??
+  '/api';
+
+const API_BASE = RAW_API_BASE === '' ? '/api' : RAW_API_BASE;
+const ABSOLUTE_URL_REGEX = /^https?:\/\//i;
+
+const ensureLeadingSlash = (value: string) =>
+  value.startsWith('/') ? value : `/${value}`;
+
+const toAbsoluteUrl = (value?: string | null) => {
+  if (!value) return undefined;
+  const trimmed = value.trim();
+  if (!trimmed) return undefined;
+
+  try {
+    const candidate = ABSOLUTE_URL_REGEX.test(trimmed)
+      ? trimmed
+      : `https://${trimmed}`;
+
+    const parsed = new URL(candidate);
+    return `${parsed.protocol}//${parsed.host}`;
+  } catch (error) {
+    console.warn('Invalid site URL value provided:', value, error);
+    return undefined;
+  }
+};
+
+function resolveSiteOrigin(): string {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL,
+    process.env.SITE_URL,
+    process.env.APP_URL,
+    process.env.NEXTAUTH_URL,
+  ];
+
+  for (const candidate of candidates) {
+    const absolute = toAbsoluteUrl(candidate);
+    if (absolute) {
+      return absolute;
+    }
+  }
+
+  const vercelHost = process.env.VERCEL_URL;
+  if (vercelHost) {
+    return toAbsoluteUrl(vercelHost) ?? 'http://localhost:3000';
+  }
+
+  return 'http://localhost:3000';
+}
 
 // Helper function to get the full API URL
 function getApiUrl(endpoint: string): string {
-  // If we're on the server (no window object), use localhost
-  if (typeof window === 'undefined') {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
-    return `${baseUrl}${BASE_URL}${endpoint}`;
+  const normalizedEndpoint = ensureLeadingSlash(endpoint);
+
+  if (ABSOLUTE_URL_REGEX.test(API_BASE)) {
+    return new URL(normalizedEndpoint, `${API_BASE.replace(/\/+$/, '')}/`).toString();
   }
-  // Client-side can use relative URLs
-  return `${BASE_URL}${endpoint}`;
+
+  const normalizedBase =
+    API_BASE === '/' ? '' : ensureLeadingSlash(API_BASE.replace(/\/+$/, ''));
+
+  if (typeof window !== 'undefined') {
+    return `${normalizedBase}${normalizedEndpoint}`;
+  }
+
+  const origin = resolveSiteOrigin();
+  return `${origin}${normalizedBase}${normalizedEndpoint}`;
 }
 
 // Generic API client with error handling

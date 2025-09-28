@@ -99,7 +99,13 @@ The application uses MySQL 8.0 with the following default credentials:
 
 ## Environment Setup
 
-Create a `.env.local` file in the root directory with your environment variables:
+Copy the provided example to get started:
+
+```bash
+cp .env.example .env.local
+```
+
+Then update the values in `.env.local` with your secrets:
 ```env
 DATABASE_URL="mysql://restaurant_user:restaurant_password@localhost:3306/restaurant_db"
 STRIPE_SECRET_KEY="your_stripe_secret_key"
