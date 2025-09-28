@@ -30,10 +30,21 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: cartItems
     });
+
+    if (sessionId) {
+      response.cookies.set('cart_session_id', sessionId, {
+        path: '/',
+        httpOnly: false,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error('Error fetching cart items:', error);
     return NextResponse.json({
@@ -101,10 +112,19 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       data: cartItem
     }, { status: 201 });
+
+    response.cookies.set('cart_session_id', body.sessionId, {
+      path: '/',
+      httpOnly: false,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30,
+    });
+
+    return response;
   } catch (error) {
     console.error('Error adding item to cart:', error);
     return NextResponse.json({
@@ -136,10 +156,21 @@ export async function DELETE(request: NextRequest) {
       where
     });
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       success: true,
       message: 'Cart cleared successfully'
     });
+
+    if (sessionId) {
+      response.cookies.set('cart_session_id', sessionId, {
+        path: '/',
+        httpOnly: false,
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 30,
+      });
+    }
+
+    return response;
   } catch (error) {
     console.error('Error clearing cart:', error);
     return NextResponse.json({

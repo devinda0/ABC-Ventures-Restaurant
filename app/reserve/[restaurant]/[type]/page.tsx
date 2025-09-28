@@ -201,7 +201,7 @@ function ErrorState({
 export default function ReservePage() {
   const params = useParams<ReservePageParams>();
   const router = useRouter();
-  const isMountedRef = useRef(true);
+  const isMountedRef = useRef(false);
 
   const restaurantParam = normalizeParam(params?.restaurant);
   const mealTypeParam = normalizeParam(params?.type);
@@ -221,16 +221,13 @@ export default function ReservePage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
   }, []);
 
   const loadReservationDetails = useCallback(async () => {
-    if (!isMountedRef.current) {
-      return;
-    }
-
     if (!restaurantParam) {
       setRestaurant(null);
       setMealRelation(null);
@@ -519,17 +516,17 @@ export default function ReservePage() {
                     priority
                   />
                 </div>
-                <div className="flex flex-row justify-between gap-2">
+                <div className="flex flex-row justify-between overflow-x-scroll gap-2">
                   {galleryImages.map((img, index) => (
                     <button
                       key={img}
                       onClick={() => setMainImage(index)}
-                      className={`relative aspect-[3/2] h-[152px] rounded-tl-2xl rounded-br-2xl overflow-hidden border-2 transition-colors ${
+                      className={`relative aspect-[3/2] h-[102px] rounded-tl-2xl rounded-br-2xl overflow-hidden border-2 transition-colors ${
                         mainImage === index ? 'border-red-600' : 'border-gray-200 hover:border-gray-300'
                       }`}
                       type="button"
                     >
-                      <Image src={img} alt={`${mealTitle} ${index + 1}`} fill className="object-cover" />
+                      <Image src={img} alt={`${mealTitle} ${index + 1}`} height={102} width={152} className="object-cover aspect-[3/2] h-full" />
                     </button>
                   ))}
                 </div>

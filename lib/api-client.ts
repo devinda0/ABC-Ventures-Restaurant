@@ -173,8 +173,12 @@ export const mealApi = {
 // Cart API functions
 export const cartApi = {
   // Get cart items by session ID
-  getBySession: async (sessionId: string) => {
-    return apiClient<CartWithMeal[]>(`/cart?sessionId=${sessionId}`);
+  getBySession: async (sessionId: string, options: RequestInit = {}) => {
+    const query = encodeURIComponent(sessionId);
+    return apiClient<CartWithMeal[]>(`/cart?sessionId=${query}`, {
+      cache: 'no-store',
+      ...options,
+    });
   },
 
   // Add item to cart
@@ -190,6 +194,7 @@ export const cartApi = {
     return apiClient<CartWithMeal>(`/cart/${id}`, {
       method: 'PUT',
       body: JSON.stringify(data),
+      cache: 'no-store',
     });
   },
 
@@ -197,13 +202,16 @@ export const cartApi = {
   remove: async (id: string) => {
     return apiClient<{ id: string }>(`/cart/${id}`, {
       method: 'DELETE',
+      cache: 'no-store',
     });
   },
 
   // Clear cart by session
   clearSession: async (sessionId: string) => {
-    return apiClient<{ message: string }>(`/cart/clear/${sessionId}`, {
+    const query = encodeURIComponent(sessionId);
+    return apiClient<{ message: string }>(`/cart?sessionId=${query}`, {
       method: 'DELETE',
+      cache: 'no-store',
     });
   },
 };
@@ -290,6 +298,13 @@ export const utils = {
     if (!sessionId) {
       sessionId = utils.generateSessionId();
       localStorage.setItem('cart_session_id', sessionId);
+    }
+
+    try {
+      const maxAge = 60 * 60 * 24 * 30; // 30 days
+      document.cookie = `cart_session_id=${sessionId}; path=/; max-age=${maxAge}; sameSite=Lax`;
+    } catch (error) {
+      console.warn('Unable to set cart session cookie', error);
     }
     return sessionId;
   },
